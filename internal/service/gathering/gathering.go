@@ -1,6 +1,8 @@
 package gathering
 
 import (
+	"errors"
+
 	"github.com/elangreza14/gathering/internal/domain"
 	"github.com/elangreza14/gathering/internal/dto"
 )
@@ -8,10 +10,10 @@ import (
 type repo interface {
 	FindMemberByID(ID int64) (*domain.Member, error)
 	FindGatheringByID(ID int64) (*domain.Gathering, error)
-	FindInvitationByGatheringIDAndMemberID(gatheringID, memberID int64) (*domain.Gathering, error)
+	FindInvitationByGatheringIDAndMemberID(gatheringID, memberID int64) (*domain.Invitation, error)
 
 	CreateGathering(domain.Gathering) (*domain.Gathering, error)
-	CreateInvitation(gatheringID int64, status string, memberID ...int64) error
+	CreateInvitations(gatheringID int64, status string, memberID ...int64) error
 	CreateAttendee(domain.Attendee) (*domain.Attendee, error)
 }
 
@@ -38,7 +40,7 @@ func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.Cr
 	}
 
 	if req.Type == "INVITATION" {
-		if err := gs.gatheringRepo.CreateInvitation(res.ID, "WAITING", req.WithAttendees...); err != nil {
+		if err := gs.gatheringRepo.CreateInvitations(res.ID, "WAITING", req.WithAttendees...); err != nil {
 			return nil, err
 		}
 	}
@@ -60,8 +62,13 @@ func (gs *GatheringService) AttendGathering(req dto.CreateAttendeeReq) (*dto.Cre
 	}
 
 	if gathering.Type == "INVITATION" {
-		if _, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(gathering.ID, member.ID); err != nil {
+		invt, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(gathering.ID, member.ID)
+		if err != nil {
 			return nil, err
+		}
+
+		if invt.MemberID != member.ID {
+			return nil, errors.New("unauthorized")
 		}
 	}
 

@@ -8,9 +8,11 @@ import (
 )
 
 type repo interface {
-	CreateMember(domain.Member) (*domain.Member, error)
 	FindMemberByID(ID int64) (*domain.Member, error)
 	FindInvitationByID(ID int64) (*domain.Invitation, error)
+
+	CreateMember(domain.Member) (*domain.Member, error)
+
 	UpdateInvitation(domain.Invitation) error
 }
 
