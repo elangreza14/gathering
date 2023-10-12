@@ -32,7 +32,6 @@ type (
 )
 
 func main() {
-
 	db, err := setup()
 	if err != nil {
 		log.Fatal(err)
@@ -78,6 +77,7 @@ func setup() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
 		env.PostgresUser,
 		env.PostgresPassword,
