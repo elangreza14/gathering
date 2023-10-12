@@ -22,4 +22,16 @@ test:
 lint:
 	gofumpt -l -w .
 
-.PHONY: up-stack up down run-local run-live migrate-create mock lint test
+mock:
+	go generate ./...
+
+FILENAME?=file-name
+
+migrate-down:
+	migrate -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOSTNAME}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSL}" -path ${MIGRATION_FOLDER} down
+	
+migrate-create:
+	@read -p  "What is the name of migration?" NAME; \
+	migrate create -ext sql -tz Asia/Jakarta -dir ${MIGRATION_FOLDER} -format "20060102150405" $$NAME
+
+.PHONY: up-stack up down run-local run-live mock lint test migrate-down migrate-create

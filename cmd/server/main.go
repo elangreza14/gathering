@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	controller "github.com/elangreza14/gathering/internal/controller"
 	repoPostgres "github.com/elangreza14/gathering/internal/repo"
 	service "github.com/elangreza14/gathering/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 )
@@ -23,45 +27,16 @@ type (
 		PostgresPassword string `mapstructure:"POSTGRES_PASSWORD"`
 		PostgresDB       string `mapstructure:"POSTGRES_DB"`
 		PostgresPort     int32  `mapstructure:"POSTGRES_PORT"`
+		MigrationFolder  string `mapstructure:"MIGRATION_FOLDER"`
 	}
 )
 
 func main() {
-	env := &Env{}
-	envBase := "local"
-	mode := os.Getenv("MODE")
-	if mode != "" {
-		envBase = mode
-	}
 
-	viper.AddConfigPath(".")
-	viper.SetConfigName(envBase)
-	viper.SetConfigType("env")
-	viper.AutomaticEnv()
-
-	err := viper.ReadInConfig()
+	db, err := setup()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = viper.Unmarshal(&env)
-	if err != nil {
-		log.Fatal(err)
-	}
-	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
-		env.PostgresUser,
-		env.PostgresPassword,
-		env.PostgresHostname,
-		env.PostgresPort,
-		env.PostgresDB,
-		env.PostgresSsl)
-	db, err := sql.Open("postgres", dbUrl)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db.SetMaxIdleConns(50)
-	db.SetMaxOpenConns(50)
 
 	repo := repoPostgres.New(db)
 
@@ -79,4 +54,58 @@ func main() {
 	gathering.PUT("/attend-gathering", gatheringController.AttendGathering())
 
 	router.Run(":5000")
+}
+
+func setup() (*sql.DB, error) {
+	env := &Env{}
+	envBase := "local"
+	mode := os.Getenv("MODE")
+	if mode != "" {
+		envBase = mode
+	}
+
+	viper.AddConfigPath(".")
+	viper.SetConfigName(envBase)
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	err = viper.Unmarshal(&env)
+	if err != nil {
+		return nil, err
+	}
+	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
+		env.PostgresUser,
+		env.PostgresPassword,
+		env.PostgresHostname,
+		env.PostgresPort,
+		env.PostgresDB,
+		env.PostgresSsl)
+	db, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	migration, err := migrate.New(
+		fmt.Sprintf("file://%v", env.MigrationFolder), dbUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	// apply migration to DB
+	if err := migration.Up(); err != nil {
+		if err != migrate.ErrNoChange {
+			return nil, err
+		}
+	}
+
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	return db, nil
 }

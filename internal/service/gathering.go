@@ -1,5 +1,7 @@
 package service
 
+//go:generate mockgen -source $GOFILE -destination ../../mock/service/mock_$GOFILE -package $GOPACKAGE
+
 import (
 	"errors"
 
@@ -28,8 +30,8 @@ func NewGatheringService(repo gatheringRepo) *GatheringService {
 }
 
 func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
-	if req.Type == "INVITATION" && len(req.Attendees) == 0 {
-		return nil, errors.New("when type is invitation attendees must be more than 0")
+	if req.Type == "INVITATION" && len(req.Attendees) < 1 {
+		return nil, errors.New("attendees must be more than 0 when type is invitation")
 	}
 
 	res, err := gs.gatheringRepo.CreateGathering(domain.Gathering{

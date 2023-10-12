@@ -1,5 +1,7 @@
 package service
 
+//go:generate mockgen -source $GOFILE -destination ../../mock/service/mock_$GOFILE -package $GOPACKAGE
+
 import (
 	"errors"
 

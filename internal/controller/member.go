@@ -28,7 +28,7 @@ func (mc *MemberController) CreateMember() gin.HandlerFunc {
 
 		res, err := mc.memberService.CreateMember(json)
 		if err != nil {
-			c.JSON(http.StatusCreated, gin.H{"status": "error", "cause": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "cause": err.Error()})
 			return
 		}
 
@@ -46,7 +46,7 @@ func (mc *MemberController) RespondInvitation() gin.HandlerFunc {
 
 		err := mc.memberService.RespondInvitation(json)
 		if err != nil {
-			c.JSON(http.StatusCreated, gin.H{"status": "error", "cause": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "cause": err.Error()})
 			return
 		}
 

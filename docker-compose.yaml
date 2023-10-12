@@ -11,12 +11,12 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data/
     networks:
-      - auth-service
+      - gathering
     env_file:
       - local.env
 
 networks:
-  auth-service:
+  gathering:
     driver: bridge
 
 volumes:
