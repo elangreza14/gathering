@@ -5,7 +5,7 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
+	"time"
 
 	"github.com/elangreza14/gathering/internal/domain"
 	"github.com/elangreza14/gathering/internal/dto"
@@ -58,28 +58,28 @@ func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateG
 	}, nil
 }
 
-func (gs *GatheringService) AttendGathering(ctx context.Context, req dto.CreateAttendeeReq) (*dto.CreateAttendeeRes, error) {
+func (gs *GatheringService) AttendGathering(ctx context.Context, currentTime time.Time, req dto.CreateAttendeeReq) (*dto.CreateAttendeeRes, error) {
 	member, err := gs.gatheringRepo.FindMemberByID(ctx, req.MemberID)
 	if err != nil {
-		fmt.Println("cek")
 		return nil, err
 	}
 
 	gathering, err := gs.gatheringRepo.FindGatheringByID(ctx, req.GatheringID)
 	if err != nil {
-		fmt.Println("cek 2")
 		return nil, err
+	}
+
+	if gathering.ScheduleAt.After(currentTime) {
+		return nil, errors.New("gathering not yet started")
 	}
 
 	if gathering.Type == domain.GatheringTypeINVITATION {
 		invt, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(ctx, gathering.ID, member.ID)
 		if err != nil {
-			fmt.Println("cek 3")
 			return nil, err
 		}
 
 		if invt.MemberID != member.ID {
-			fmt.Println("cek 4")
 			return nil, errors.New("unauthorized")
 		}
 	}
@@ -89,7 +89,6 @@ func (gs *GatheringService) AttendGathering(ctx context.Context, req dto.CreateA
 		GatheringID: gathering.ID,
 	})
 	if err != nil {
-		fmt.Println("cek 5")
 		return nil, err
 	}
 

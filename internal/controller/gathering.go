@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/elangreza14/gathering/internal/dto"
 	service "github.com/elangreza14/gathering/internal/service"
@@ -44,7 +45,7 @@ func (mc *GatheringController) AttendGathering() gin.HandlerFunc {
 			return
 		}
 
-		res, err := mc.gatheringService.AttendGathering(c.Request.Context(), json)
+		res, err := mc.gatheringService.AttendGathering(c.Request.Context(), time.Now(), json)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "cause": err.Error()})
 			return

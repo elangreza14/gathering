@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/elangreza14/gathering/internal/domain"
 	"github.com/elangreza14/gathering/internal/dto"
@@ -20,6 +21,7 @@ type TestGatheringServiceSuite struct {
 
 	MockCreateGatheringReq dto.CreateGatheringReq
 	MockCreateAttendeeReq  dto.CreateAttendeeReq
+	MockTimePassed         time.Time
 	Cs                     *GatheringService
 	Ctrl                   *gomock.Controller
 }
@@ -36,6 +38,11 @@ func (suite *TestGatheringServiceSuite) SetupSuite() {
 		GatheringID: 1,
 	}
 	suite.Cs = NewGatheringService(suite.MockGatheringRepo)
+
+	layoutFormat := "2006-01-02 15:04:05"
+	value := "2023-10-12 08:04:00"
+	v, _ := time.Parse(layoutFormat, value)
+	suite.MockTimePassed = v
 }
 
 func (suite *TestGatheringServiceSuite) TearDownSuite() {
@@ -109,7 +116,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 
 		suite.MockGatheringRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(nil, errors.New("err from db"))
 
-		_, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
 	})
@@ -119,9 +126,31 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 		suite.MockGatheringRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(nil, nil)
 		suite.MockGatheringRepo.EXPECT().FindGatheringByID(ctx, gomock.Any()).Return(nil, errors.New("err from db"))
 
-		_, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
+	})
+
+	suite.Run("error time not yet passed", func() {
+		ctx := context.Background()
+
+		layoutFormat := "2006-01-02 15:04:05"
+		value := "2023-10-12 10:04:00"
+		v, _ := time.Parse(layoutFormat, value)
+		gathering := &domain.Gathering{
+			ID:         1,
+			Creator:    "",
+			Type:       "INVITATION",
+			ScheduleAt: v,
+		}
+		suite.MockGatheringRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
+			ID: 1,
+		}, nil)
+		suite.MockGatheringRepo.EXPECT().FindGatheringByID(ctx, gomock.Any()).Return(gathering, nil)
+
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
+		suite.Error(err)
+		suite.Equal(err.Error(), "gathering not yet started")
 	})
 
 	suite.Run("error when getting member from db", func() {
@@ -138,7 +167,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 				MemberID: 2,
 			}, nil)
 
-		_, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "unauthorized")
 	})
@@ -159,7 +188,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 		suite.MockGatheringRepo.EXPECT().CreateAttendee(ctx, gomock.Any()).Return(
 			nil, errors.New("err from db"))
 
-		_, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
 	})
@@ -182,7 +211,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 				ID: 1,
 			}, nil)
 
-		res, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		res, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.NoError(err)
 		suite.Equal(res.ID, int64(1))
 	})
@@ -201,7 +230,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 				ID: 1,
 			}, nil)
 
-		res, err := suite.Cs.AttendGathering(ctx, suite.MockCreateAttendeeReq)
+		res, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
 		suite.NoError(err)
 		suite.Equal(res.ID, int64(1))
 	})
