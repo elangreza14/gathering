@@ -1,4 +1,4 @@
-package gathering
+package service
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"github.com/elangreza14/gathering/internal/dto"
 )
 
-type repo interface {
+type gatheringRepo interface {
 	FindMemberByID(ID int64) (*domain.Member, error)
 	FindGatheringByID(ID int64) (*domain.Gathering, error)
 	FindInvitationByGatheringIDAndMemberID(gatheringID, memberID int64) (*domain.Invitation, error)
@@ -18,12 +18,12 @@ type repo interface {
 }
 
 type GatheringService struct {
-	gatheringRepo repo
+	gatheringRepo gatheringRepo
 }
 
-func NewGatheringService(GatheringRepo repo) *GatheringService {
+func NewGatheringService(repo gatheringRepo) *GatheringService {
 	return &GatheringService{
-		gatheringRepo: GatheringRepo,
+		gatheringRepo: repo,
 	}
 }
 

@@ -1,4 +1,4 @@
-package member
+package service
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"github.com/elangreza14/gathering/internal/dto"
 )
 
-type repo interface {
+type memberRepo interface {
 	FindMemberByID(ID int64) (*domain.Member, error)
 	FindInvitationByID(ID int64) (*domain.Invitation, error)
 
@@ -17,12 +17,12 @@ type repo interface {
 }
 
 type MemberService struct {
-	memberRepo repo
+	memberRepo memberRepo
 }
 
-func NewMemberService(MemberRepo repo) *MemberService {
+func NewMemberService(repo memberRepo) *MemberService {
 	return &MemberService{
-		memberRepo: MemberRepo,
+		memberRepo: repo,
 	}
 }
 
