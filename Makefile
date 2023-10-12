@@ -11,10 +11,10 @@ down:
 	docker-compose --env-file local.env down
 
 run-local:
-	MODE=local go run main.go
+	MODE=local go run cmd/server/main.go
 	
 run-live:
-	go run main.go
+	go run cmd/server/main.go
 
 test:
 	 go test -coverprofile=coverage.out ./... ; go tool cover -html=coverage.out

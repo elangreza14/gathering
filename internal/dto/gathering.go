@@ -3,12 +3,12 @@ package dto
 import "time"
 
 type CreateGatheringReq struct {
-	Creator       string
-	Type          string
-	ScheduleAt    time.Time
-	Name          string
-	Location      string
-	WithAttendees []int64
+	Creator    string    `json:"creator" binding:"required"`
+	Type       string    `json:"type" binding:"required"`
+	ScheduleAt time.Time `json:"schedule_at" binding:"required"`
+	Name       string    `json:"name" binding:"required"`
+	Location   string    `json:"location" binding:"required"`
+	Attendees  []int64   `json:"attendees"`
 }
 
 type CreateGatheringRes struct {

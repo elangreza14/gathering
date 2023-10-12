@@ -2,16 +2,60 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
 	controller "github.com/elangreza14/gathering/internal/controller"
 	repoPostgres "github.com/elangreza14/gathering/internal/repo"
 	service "github.com/elangreza14/gathering/internal/service"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
+)
+
+type (
+	// Env is list all of env
+	Env struct {
+		PostgresHostname string `mapstructure:"POSTGRES_HOSTNAME"`
+		PostgresSsl      string `mapstructure:"POSTGRES_SSL"`
+		PostgresUser     string `mapstructure:"POSTGRES_USER"`
+		PostgresPassword string `mapstructure:"POSTGRES_PASSWORD"`
+		PostgresDB       string `mapstructure:"POSTGRES_DB"`
+		PostgresPort     int32  `mapstructure:"POSTGRES_PORT"`
+	}
 )
 
 func main() {
-	db, err := sql.Open("driver-name", "database=test1")
+	env := &Env{}
+	envBase := "local"
+	mode := os.Getenv("MODE")
+	if mode != "" {
+		envBase = mode
+	}
+
+	viper.AddConfigPath(".")
+	viper.SetConfigName(envBase)
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = viper.Unmarshal(&env)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
+		env.PostgresUser,
+		env.PostgresPassword,
+		env.PostgresHostname,
+		env.PostgresPort,
+		env.PostgresDB,
+		env.PostgresSsl)
+	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatal(err)
 	}

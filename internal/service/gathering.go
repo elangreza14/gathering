@@ -28,6 +28,10 @@ func NewGatheringService(repo gatheringRepo) *GatheringService {
 }
 
 func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
+	if req.Type == "INVITATION" && len(req.Attendees) == 0 {
+		return nil, errors.New("when type is invitation attendees must be more than 0")
+	}
+
 	res, err := gs.gatheringRepo.CreateGathering(domain.Gathering{
 		Creator:    req.Creator,
 		Type:       req.Type,
@@ -40,7 +44,7 @@ func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.Cr
 	}
 
 	if req.Type == "INVITATION" {
-		if err := gs.gatheringRepo.CreateInvitations(res.ID, "WAITING", req.WithAttendees...); err != nil {
+		if err := gs.gatheringRepo.CreateInvitations(res.ID, "WAITING", req.Attendees...); err != nil {
 			return nil, err
 		}
 	}
