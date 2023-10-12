@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "members" (
   "last_name" VARCHAR(50) NOT NULL,
   "email" VARCHAR NOT NULL,
   
-  UNIQUE ("id", "email")
+  UNIQUE ("email")
 );
 
 -- index

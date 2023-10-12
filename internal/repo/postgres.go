@@ -39,7 +39,7 @@ func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*do
 	  first_name, last_name, email
 	) VALUES (
 	  $1, $2, $3
-	)
+	) RETURNING id, first_name, last_name, email
 	`
 
 	row := r.db.QueryRowContext(ctx, createAuthor, arg.FirstName, arg.LastName, arg.Email)
@@ -49,7 +49,18 @@ func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*do
 }
 
 func (r *RepoPostgres) CreateGathering(ctx context.Context, arg domain.Gathering) (*domain.Gathering, error) {
-	return nil, nil
+	const createGathering = `
+	INSERT INTO gatherings (
+	  creator, type, schedule_at, name, location
+	) VALUES (
+	  $1, $2, $3, $4, $5
+	) RETURNING id, creator, type, schedule_at, name, location
+	`
+
+	row := r.db.QueryRowContext(ctx, createGathering, arg.Creator, arg.Type, arg.ScheduleAt, arg.Name, arg.Location)
+	i := &domain.Gathering{}
+	err := row.Scan(&i.ID, &i.Creator, &i.Type, &i.ScheduleAt, &i.Name, &i.Location)
+	return i, err
 }
 
 func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error) {

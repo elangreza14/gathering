@@ -2,11 +2,19 @@ package domain
 
 import "time"
 
-type Gathering struct {
-	ID         int64
-	Creator    string
-	Type       string
-	ScheduleAt time.Time
-	Name       string
-	Location   string
-}
+type (
+	GatheringType string
+	Gathering     struct {
+		ID         int64
+		Creator    string
+		Type       GatheringType
+		ScheduleAt time.Time
+		Name       string
+		Location   string
+	}
+)
+
+const (
+	GatheringTypeFREE       GatheringType = "FREE"
+	GatheringTypeINVITATION GatheringType = "INVITATION"
+)

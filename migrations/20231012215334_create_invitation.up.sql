@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "invitations" (
 
   "member_id" BIGINT NOT NULL,
   "gathering_id" BIGINT NOT NULL,
-  "status" VARCHAR(20) NOT NULL,
+  "status" VARCHAR(50) NOT NULL,
 
   UNIQUE ("id")
 );

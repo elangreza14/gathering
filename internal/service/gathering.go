@@ -31,7 +31,7 @@ func NewGatheringService(repo gatheringRepo) *GatheringService {
 }
 
 func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
-	if req.Type == "INVITATION" && len(req.Attendees) < 1 {
+	if req.Type == domain.GatheringTypeINVITATION && len(req.Attendees) < 1 {
 		return nil, errors.New("attendees must be more than 0 when type is invitation")
 	}
 
@@ -46,7 +46,7 @@ func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateG
 		return nil, err
 	}
 
-	if req.Type == "INVITATION" {
+	if req.Type == domain.GatheringTypeINVITATION {
 		if err := gs.gatheringRepo.CreateInvitations(ctx, res.ID, "WAITING", req.Attendees...); err != nil {
 			return nil, err
 		}
@@ -68,7 +68,7 @@ func (gs *GatheringService) AttendGathering(ctx context.Context, req dto.CreateA
 		return nil, err
 	}
 
-	if gathering.Type == "INVITATION" {
+	if gathering.Type == domain.GatheringTypeINVITATION {
 		invt, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(ctx, gathering.ID, member.ID)
 		if err != nil {
 			return nil, err

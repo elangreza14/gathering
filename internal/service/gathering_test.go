@@ -28,7 +28,7 @@ func (suite *TestGatheringServiceSuite) SetupSuite() {
 	suite.Ctrl = gomock.NewController(suite.T())
 	suite.MockGatheringRepo = gomockService.NewMockgatheringRepo(suite.Ctrl)
 	suite.MockCreateGatheringReq = dto.CreateGatheringReq{
-		Type:      "INVITATION",
+		Type:      domain.GatheringTypeINVITATION,
 		Attendees: []int64{},
 	}
 	suite.MockCreateAttendeeReq = dto.CreateAttendeeReq{
@@ -92,7 +92,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_CreateGathering() {
 
 	suite.Run("create success when type is free", func() {
 		ctx := context.Background()
-		suite.MockCreateGatheringReq.Type = "FREE"
+		suite.MockCreateGatheringReq.Type = domain.GatheringTypeFREE
 		suite.MockGatheringRepo.EXPECT().CreateGathering(ctx, gomock.Any()).Return(&domain.Gathering{
 			ID: 1,
 		}, nil)
@@ -194,7 +194,7 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 		}, nil)
 		suite.MockGatheringRepo.EXPECT().FindGatheringByID(ctx, gomock.Any()).Return(&domain.Gathering{
 			ID:   1,
-			Type: "FREE",
+			Type: domain.GatheringTypeFREE,
 		}, nil)
 		suite.MockGatheringRepo.EXPECT().CreateAttendee(ctx, gomock.Any()).Return(
 			&domain.Attendee{
