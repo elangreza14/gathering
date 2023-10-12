@@ -67,7 +67,26 @@ func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) 
 	return nil, nil
 }
 
-func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64, status string, memberID ...int64) error {
+func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64, status domain.InvitationStatus, memberIDs ...int64) error {
+	const createInvitation = `
+	INSERT INTO invitations (
+	  member_id, gathering_id, status
+	) VALUES (
+	  $1, $2, $3
+	) 
+	`
+
+	stmt, err := r.db.Prepare(createInvitation)
+	if err != nil {
+		return err
+	}
+
+	for i := 0; i < len(memberIDs); i++ {
+		if _, err = stmt.ExecContext(ctx, memberIDs[i], gatheringID, status); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

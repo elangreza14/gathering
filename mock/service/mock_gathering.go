@@ -70,7 +70,7 @@ func (mr *MockgatheringRepoMockRecorder) CreateGathering(ctx, arg any) *gomock.C
 }
 
 // CreateInvitations mocks base method.
-func (m *MockgatheringRepo) CreateInvitations(ctx context.Context, gatheringID int64, status string, memberID ...int64) error {
+func (m *MockgatheringRepo) CreateInvitations(ctx context.Context, gatheringID int64, status domain.InvitationStatus, memberID ...int64) error {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, gatheringID, status}
 	for _, a := range memberID {

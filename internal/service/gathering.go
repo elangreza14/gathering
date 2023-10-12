@@ -16,7 +16,7 @@ type gatheringRepo interface {
 	FindInvitationByGatheringIDAndMemberID(ctx context.Context, gatheringID, memberID int64) (*domain.Invitation, error)
 
 	CreateGathering(ctx context.Context, arg domain.Gathering) (*domain.Gathering, error)
-	CreateInvitations(ctx context.Context, gatheringID int64, status string, memberID ...int64) error
+	CreateInvitations(ctx context.Context, gatheringID int64, status domain.InvitationStatus, memberID ...int64) error
 	CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error)
 }
 
@@ -47,7 +47,7 @@ func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateG
 	}
 
 	if req.Type == domain.GatheringTypeINVITATION {
-		if err := gs.gatheringRepo.CreateInvitations(ctx, res.ID, "WAITING", req.Attendees...); err != nil {
+		if err := gs.gatheringRepo.CreateInvitations(ctx, res.ID, domain.InvitationStatusWAITING, req.Attendees...); err != nil {
 			return nil, err
 		}
 	}

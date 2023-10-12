@@ -6,6 +6,8 @@ import (
 	"github.com/elangreza14/gathering/internal/domain"
 )
 
+// https://blog.logrocket.com/gin-binding-in-go-a-tutorial-with-examples/
+
 type CreateGatheringReq struct {
 	Creator    string               `json:"creator" binding:"required"`
 	Type       domain.GatheringType `json:"type" binding:"oneof=FREE INVITATION"`
