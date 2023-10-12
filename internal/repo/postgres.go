@@ -40,11 +40,25 @@ func (r *RepoPostgres) FindInvitationByID(ctx context.Context, ID int64) (*domai
 }
 
 func (r *RepoPostgres) FindGatheringByID(ctx context.Context, ID int64) (*domain.Gathering, error) {
-	return nil, nil
+	const getGathering = `
+	SELECT id, creator, type, schedule_at, name, location FROM gatherings
+	WHERE id = $1 LIMIT 1`
+
+	row := r.db.QueryRowContext(ctx, getGathering, ID)
+	i := &domain.Gathering{}
+	err := row.Scan(&i.ID, &i.Creator, &i.Type, &i.ScheduleAt, &i.Name, &i.Location)
+	return i, err
 }
 
 func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(ctx context.Context, gatheringID, memberID int64) (*domain.Invitation, error) {
-	return nil, nil
+	const getInvitation = `
+	SELECT id, member_id, gathering_id, status FROM invitations
+	WHERE gathering_id = $1 AND member_id=$2 LIMIT 1`
+
+	row := r.db.QueryRowContext(ctx, getInvitation, gatheringID, memberID)
+	i := &domain.Invitation{}
+	err := row.Scan(&i.ID, &i.MemberID, &i.GatheringID, &i.Status)
+	return i, err
 }
 
 func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*domain.Member, error) {
@@ -78,7 +92,18 @@ func (r *RepoPostgres) CreateGathering(ctx context.Context, arg domain.Gathering
 }
 
 func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error) {
-	return nil, nil
+	const createAttendee = `
+	INSERT INTO attendees (
+	  member_id, gathering_id
+	) VALUES (
+	  $1, $2
+	) RETURNING id, member_id, gathering_id
+	`
+
+	row := r.db.QueryRowContext(ctx, createAttendee, arg.MemberID, arg.GatheringID)
+	i := &domain.Attendee{}
+	err := row.Scan(&i.ID, &i.MemberID, &i.GatheringID)
+	return i, err
 }
 
 func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64, status domain.InvitationStatus, memberIDs ...int64) error {
@@ -111,5 +136,4 @@ func (r *RepoPostgres) UpdateInvitation(ctx context.Context, arg domain.Invitati
 
 	_, err := r.db.ExecContext(ctx, updateInvitation, arg.ID, arg.Status)
 	return err
-
 }

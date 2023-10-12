@@ -18,5 +18,5 @@ type CreateGatheringReq struct {
 }
 
 type CreateGatheringRes struct {
-	ID int64
+	ID int64 `json:"id"`
 }
