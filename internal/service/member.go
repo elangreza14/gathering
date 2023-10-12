@@ -59,11 +59,7 @@ func (is *MemberService) RespondInvitation(ctx context.Context, req dto.RespondI
 		return errors.New("unauthorized")
 	}
 
-	if req.Attend {
-		invitation.Status = "ATTEND"
-	} else {
-		invitation.Status = "ABSENT"
-	}
+	invitation.Status = req.Attend
 
 	return is.memberRepo.UpdateInvitation(ctx, *invitation)
 }

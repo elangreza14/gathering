@@ -18,11 +18,25 @@ func New(db *sql.DB) *RepoPostgres {
 }
 
 func (r *RepoPostgres) FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error) {
-	return nil, nil
+	const getMember = `
+	SELECT id, email, first_name, last_name FROM members
+	WHERE id = $1 LIMIT 1`
+
+	row := r.db.QueryRowContext(ctx, getMember, ID)
+	i := &domain.Member{}
+	err := row.Scan(&i.ID, &i.Email, &i.FirstName, &i.LastName)
+	return i, err
 }
 
 func (r *RepoPostgres) FindInvitationByID(ctx context.Context, ID int64) (*domain.Invitation, error) {
-	return nil, nil
+	const getInvitation = `
+	SELECT id, member_id, gathering_id, status FROM invitations
+	WHERE id = $1 LIMIT 1`
+
+	row := r.db.QueryRowContext(ctx, getInvitation, ID)
+	i := &domain.Invitation{}
+	err := row.Scan(&i.ID, &i.MemberID, &i.GatheringID, &i.Status)
+	return i, err
 }
 
 func (r *RepoPostgres) FindGatheringByID(ctx context.Context, ID int64) (*domain.Gathering, error) {
@@ -91,5 +105,11 @@ func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64,
 }
 
 func (r *RepoPostgres) UpdateInvitation(ctx context.Context, arg domain.Invitation) error {
-	return nil
+	const updateInvitation = `
+	UPDATE invitations SET status = $2
+	WHERE id = $1`
+
+	_, err := r.db.ExecContext(ctx, updateInvitation, arg.ID, arg.Status)
+	return err
+
 }

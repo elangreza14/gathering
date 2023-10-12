@@ -35,7 +35,7 @@ func (suite *TestMemberServiceSuite) SetupSuite() {
 	suite.MockRespondInvitationReq = dto.RespondInvitationReq{
 		MemberID:     1,
 		InvitationID: 1,
-		Attend:       true,
+		Attend:       domain.InvitationStatusATTEND,
 	}
 	suite.Cs = NewMemberService(suite.MockMemberRepo)
 }
@@ -106,7 +106,7 @@ func (suite *TestMemberServiceSuite) TestMemberService_AttendMember() {
 
 	suite.Run("error when update invitation", func() {
 		ctx := context.Background()
-		suite.MockRespondInvitationReq.Attend = true
+		suite.MockRespondInvitationReq.Attend = domain.InvitationStatusATTEND
 		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)
@@ -121,7 +121,7 @@ func (suite *TestMemberServiceSuite) TestMemberService_AttendMember() {
 
 	suite.Run("success update invitation", func() {
 		ctx := context.Background()
-		suite.MockRespondInvitationReq.Attend = false
+		suite.MockRespondInvitationReq.Attend = domain.InvitationStatusABSENT
 		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)

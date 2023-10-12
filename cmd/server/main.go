@@ -45,12 +45,12 @@ func main() {
 	memberController := controller.NewMemberController(service.NewMemberService(repo))
 	member := v1.Group("/member")
 	member.POST("/", memberController.CreateMember())
-	member.PUT("/accept-invitation", memberController.RespondInvitation())
+	member.PUT("/invitation", memberController.RespondInvitation())
 
 	gatheringController := controller.NewGatheringController(service.NewGatheringService(repo))
 	gathering := v1.Group("/gathering")
 	gathering.POST("/", gatheringController.CreateGathering())
-	gathering.PUT("/attend-gathering", gatheringController.AttendGathering())
+	gathering.PUT("/attends", gatheringController.AttendGathering())
 
 	router.Run(":5000")
 }
