@@ -1,6 +1,7 @@
 package repoPostgres
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/elangreza14/gathering/internal/domain"
@@ -16,38 +17,49 @@ func New(db *sql.DB) *RepoPostgres {
 	}
 }
 
-func (r *RepoPostgres) FindMemberByID(ID int64) (*domain.Member, error) {
+func (r *RepoPostgres) FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) FindInvitationByID(ID int64) (*domain.Invitation, error) {
+func (r *RepoPostgres) FindInvitationByID(ctx context.Context, ID int64) (*domain.Invitation, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) FindGatheringByID(ID int64) (*domain.Gathering, error) {
+func (r *RepoPostgres) FindGatheringByID(ctx context.Context, ID int64) (*domain.Gathering, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(gatheringID, memberID int64) (*domain.Invitation, error) {
+func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(ctx context.Context, gatheringID, memberID int64) (*domain.Invitation, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) CreateMember(domain.Member) (*domain.Member, error) {
+func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*domain.Member, error) {
+	const createAuthor = `
+	INSERT INTO members (
+	  first_name, last_name, email
+	) VALUES (
+	  $1, $2, $3
+	)
+	`
+
+	row := r.db.QueryRowContext(ctx, createAuthor, arg.FirstName, arg.LastName, arg.Email)
+	i := &domain.Member{}
+	err := row.Scan(&i.ID, &i.FirstName, &i.LastName, &i.Email)
+	return i, err
+}
+
+func (r *RepoPostgres) CreateGathering(ctx context.Context, arg domain.Gathering) (*domain.Gathering, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) CreateGathering(domain.Gathering) (*domain.Gathering, error) {
+func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error) {
 	return nil, nil
 }
 
-func (r *RepoPostgres) CreateAttendee(domain.Attendee) (*domain.Attendee, error) {
-	return nil, nil
-}
-
-func (r *RepoPostgres) CreateInvitations(gatheringID int64, status string, memberID ...int64) error {
+func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64, status string, memberID ...int64) error {
 	return nil
 }
 
-func (r *RepoPostgres) UpdateInvitation(domain.Invitation) error {
+func (r *RepoPostgres) UpdateInvitation(ctx context.Context, arg domain.Invitation) error {
 	return nil
 }

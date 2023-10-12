@@ -3,6 +3,7 @@ package service
 //go:generate mockgen -source $GOFILE -destination ../../mock/service/mock_$GOFILE -package $GOPACKAGE
 
 import (
+	"context"
 	"errors"
 
 	"github.com/elangreza14/gathering/internal/domain"
@@ -10,12 +11,12 @@ import (
 )
 
 type memberRepo interface {
-	FindMemberByID(ID int64) (*domain.Member, error)
-	FindInvitationByID(ID int64) (*domain.Invitation, error)
+	FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error)
+	FindInvitationByID(ctx context.Context, ID int64) (*domain.Invitation, error)
 
-	CreateMember(domain.Member) (*domain.Member, error)
+	CreateMember(ctx context.Context, arg domain.Member) (*domain.Member, error)
 
-	UpdateInvitation(domain.Invitation) error
+	UpdateInvitation(ctx context.Context, arg domain.Invitation) error
 }
 
 type MemberService struct {
@@ -28,8 +29,8 @@ func NewMemberService(repo memberRepo) *MemberService {
 	}
 }
 
-func (is *MemberService) CreateMember(req dto.CreateMemberReq) (*dto.CreateMemberRes, error) {
-	res, err := is.memberRepo.CreateMember(domain.Member{
+func (is *MemberService) CreateMember(ctx context.Context, req dto.CreateMemberReq) (*dto.CreateMemberRes, error) {
+	res, err := is.memberRepo.CreateMember(ctx, domain.Member{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Email:     req.Email,
@@ -43,13 +44,13 @@ func (is *MemberService) CreateMember(req dto.CreateMemberReq) (*dto.CreateMembe
 	}, nil
 }
 
-func (is *MemberService) RespondInvitation(req dto.RespondInvitationReq) error {
-	member, err := is.memberRepo.FindMemberByID(req.MemberID)
+func (is *MemberService) RespondInvitation(ctx context.Context, req dto.RespondInvitationReq) error {
+	member, err := is.memberRepo.FindMemberByID(ctx, req.MemberID)
 	if err != nil {
 		return err
 	}
 
-	invitation, err := is.memberRepo.FindInvitationByID(req.InvitationID)
+	invitation, err := is.memberRepo.FindInvitationByID(ctx, req.InvitationID)
 	if err != nil {
 		return err
 	}
@@ -64,5 +65,5 @@ func (is *MemberService) RespondInvitation(req dto.RespondInvitationReq) error {
 		invitation.Status = "ABSENT"
 	}
 
-	return is.memberRepo.UpdateInvitation(*invitation)
+	return is.memberRepo.UpdateInvitation(ctx, *invitation)
 }

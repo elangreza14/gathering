@@ -9,6 +9,7 @@
 package service
 
 import (
+	context "context"
 	reflect "reflect"
 
 	domain "github.com/elangreza14/gathering/internal/domain"
@@ -39,60 +40,60 @@ func (m *MockmemberRepo) EXPECT() *MockmemberRepoMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockmemberRepo) CreateMember(arg0 domain.Member) (*domain.Member, error) {
+func (m *MockmemberRepo) CreateMember(ctx context.Context, arg domain.Member) (*domain.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateMember", arg0)
+	ret := m.ctrl.Call(m, "CreateMember", ctx, arg)
 	ret0, _ := ret[0].(*domain.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateMember indicates an expected call of CreateMember.
-func (mr *MockmemberRepoMockRecorder) CreateMember(arg0 any) *gomock.Call {
+func (mr *MockmemberRepoMockRecorder) CreateMember(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockmemberRepo)(nil).CreateMember), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockmemberRepo)(nil).CreateMember), ctx, arg)
 }
 
 // FindInvitationByID mocks base method.
-func (m *MockmemberRepo) FindInvitationByID(ID int64) (*domain.Invitation, error) {
+func (m *MockmemberRepo) FindInvitationByID(ctx context.Context, ID int64) (*domain.Invitation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindInvitationByID", ID)
+	ret := m.ctrl.Call(m, "FindInvitationByID", ctx, ID)
 	ret0, _ := ret[0].(*domain.Invitation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindInvitationByID indicates an expected call of FindInvitationByID.
-func (mr *MockmemberRepoMockRecorder) FindInvitationByID(ID any) *gomock.Call {
+func (mr *MockmemberRepoMockRecorder) FindInvitationByID(ctx, ID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindInvitationByID", reflect.TypeOf((*MockmemberRepo)(nil).FindInvitationByID), ID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindInvitationByID", reflect.TypeOf((*MockmemberRepo)(nil).FindInvitationByID), ctx, ID)
 }
 
 // FindMemberByID mocks base method.
-func (m *MockmemberRepo) FindMemberByID(ID int64) (*domain.Member, error) {
+func (m *MockmemberRepo) FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindMemberByID", ID)
+	ret := m.ctrl.Call(m, "FindMemberByID", ctx, ID)
 	ret0, _ := ret[0].(*domain.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindMemberByID indicates an expected call of FindMemberByID.
-func (mr *MockmemberRepoMockRecorder) FindMemberByID(ID any) *gomock.Call {
+func (mr *MockmemberRepoMockRecorder) FindMemberByID(ctx, ID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMemberByID", reflect.TypeOf((*MockmemberRepo)(nil).FindMemberByID), ID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindMemberByID", reflect.TypeOf((*MockmemberRepo)(nil).FindMemberByID), ctx, ID)
 }
 
 // UpdateInvitation mocks base method.
-func (m *MockmemberRepo) UpdateInvitation(arg0 domain.Invitation) error {
+func (m *MockmemberRepo) UpdateInvitation(ctx context.Context, arg domain.Invitation) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateInvitation", arg0)
+	ret := m.ctrl.Call(m, "UpdateInvitation", ctx, arg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateInvitation indicates an expected call of UpdateInvitation.
-func (mr *MockmemberRepoMockRecorder) UpdateInvitation(arg0 any) *gomock.Call {
+func (mr *MockmemberRepoMockRecorder) UpdateInvitation(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateInvitation", reflect.TypeOf((*MockmemberRepo)(nil).UpdateInvitation), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateInvitation", reflect.TypeOf((*MockmemberRepo)(nil).UpdateInvitation), ctx, arg)
 }

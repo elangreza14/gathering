@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -49,19 +50,21 @@ func TestMemberServiceTestSuite(t *testing.T) {
 
 func (suite *TestMemberServiceSuite) TestMemberService_CreateMember() {
 	suite.Run("err from db", func() {
-		suite.MockMemberRepo.EXPECT().CreateMember(gomock.Any()).Return(nil, errors.New("err from db"))
+		ctx := context.Background()
+		suite.MockMemberRepo.EXPECT().CreateMember(ctx, gomock.Any()).Return(nil, errors.New("err from db"))
 
-		_, err := suite.Cs.CreateMember(suite.MockCreateMemberReq)
+		_, err := suite.Cs.CreateMember(ctx, suite.MockCreateMemberReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
 	})
 
 	suite.Run("success", func() {
-		suite.MockMemberRepo.EXPECT().CreateMember(gomock.Any()).Return(&domain.Member{
+		ctx := context.Background()
+		suite.MockMemberRepo.EXPECT().CreateMember(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)
 
-		res, err := suite.Cs.CreateMember(suite.MockCreateMemberReq)
+		res, err := suite.Cs.CreateMember(ctx, suite.MockCreateMemberReq)
 		suite.NoError(err)
 		suite.Equal(res.ID, int64(1))
 	})
@@ -69,60 +72,65 @@ func (suite *TestMemberServiceSuite) TestMemberService_CreateMember() {
 
 func (suite *TestMemberServiceSuite) TestMemberService_AttendMember() {
 	suite.Run("FindMemberByID err from db", func() {
-		suite.MockMemberRepo.EXPECT().FindMemberByID(gomock.Any()).Return(nil, errors.New("err from db"))
+		ctx := context.Background()
+		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(nil, errors.New("err from db"))
 
-		err := suite.Cs.RespondInvitation(suite.MockRespondInvitationReq)
+		err := suite.Cs.RespondInvitation(ctx, suite.MockRespondInvitationReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
 	})
 
 	suite.Run("FindInvitationByID err from db", func() {
-		suite.MockMemberRepo.EXPECT().FindMemberByID(gomock.Any()).Return(nil, nil)
-		suite.MockMemberRepo.EXPECT().FindInvitationByID(gomock.Any()).Return(nil, errors.New("err from db"))
+		ctx := context.Background()
+		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(nil, nil)
+		suite.MockMemberRepo.EXPECT().FindInvitationByID(ctx, gomock.Any()).Return(nil, errors.New("err from db"))
 
-		err := suite.Cs.RespondInvitation(suite.MockRespondInvitationReq)
+		err := suite.Cs.RespondInvitation(ctx, suite.MockRespondInvitationReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "err from db")
 	})
 
 	suite.Run("unauthorized", func() {
-		suite.MockMemberRepo.EXPECT().FindMemberByID(gomock.Any()).Return(&domain.Member{
+		ctx := context.Background()
+		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)
-		suite.MockMemberRepo.EXPECT().FindInvitationByID(gomock.Any()).Return(&domain.Invitation{
+		suite.MockMemberRepo.EXPECT().FindInvitationByID(ctx, gomock.Any()).Return(&domain.Invitation{
 			MemberID: 2,
 		}, nil)
 
-		err := suite.Cs.RespondInvitation(suite.MockRespondInvitationReq)
+		err := suite.Cs.RespondInvitation(ctx, suite.MockRespondInvitationReq)
 		suite.Error(err)
 		suite.Equal(err.Error(), "unauthorized")
 	})
 
 	suite.Run("error when update invitation", func() {
+		ctx := context.Background()
 		suite.MockRespondInvitationReq.Attend = true
-		suite.MockMemberRepo.EXPECT().FindMemberByID(gomock.Any()).Return(&domain.Member{
+		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)
-		suite.MockMemberRepo.EXPECT().FindInvitationByID(gomock.Any()).Return(&domain.Invitation{
+		suite.MockMemberRepo.EXPECT().FindInvitationByID(ctx, gomock.Any()).Return(&domain.Invitation{
 			MemberID: 1,
 		}, nil)
-		suite.MockMemberRepo.EXPECT().UpdateInvitation(gomock.Any()).Return(errors.New("err from db"))
+		suite.MockMemberRepo.EXPECT().UpdateInvitation(ctx, gomock.Any()).Return(errors.New("err from db"))
 
-		err := suite.Cs.RespondInvitation(suite.MockRespondInvitationReq)
+		err := suite.Cs.RespondInvitation(ctx, suite.MockRespondInvitationReq)
 		suite.Error(err)
 	})
 
 	suite.Run("success update invitation", func() {
+		ctx := context.Background()
 		suite.MockRespondInvitationReq.Attend = false
-		suite.MockMemberRepo.EXPECT().FindMemberByID(gomock.Any()).Return(&domain.Member{
+		suite.MockMemberRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
 			ID: 1,
 		}, nil)
-		suite.MockMemberRepo.EXPECT().FindInvitationByID(gomock.Any()).Return(&domain.Invitation{
+		suite.MockMemberRepo.EXPECT().FindInvitationByID(ctx, gomock.Any()).Return(&domain.Invitation{
 			MemberID: 1,
 		}, nil)
-		suite.MockMemberRepo.EXPECT().UpdateInvitation(gomock.Any()).Return(nil)
+		suite.MockMemberRepo.EXPECT().UpdateInvitation(ctx, gomock.Any()).Return(nil)
 
-		err := suite.Cs.RespondInvitation(suite.MockRespondInvitationReq)
+		err := suite.Cs.RespondInvitation(ctx, suite.MockRespondInvitationReq)
 		suite.NoError(err)
 	})
 }

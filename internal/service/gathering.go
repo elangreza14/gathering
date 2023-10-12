@@ -3,6 +3,7 @@ package service
 //go:generate mockgen -source $GOFILE -destination ../../mock/service/mock_$GOFILE -package $GOPACKAGE
 
 import (
+	"context"
 	"errors"
 
 	"github.com/elangreza14/gathering/internal/domain"
@@ -10,13 +11,13 @@ import (
 )
 
 type gatheringRepo interface {
-	FindMemberByID(ID int64) (*domain.Member, error)
-	FindGatheringByID(ID int64) (*domain.Gathering, error)
-	FindInvitationByGatheringIDAndMemberID(gatheringID, memberID int64) (*domain.Invitation, error)
+	FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error)
+	FindGatheringByID(ctx context.Context, ID int64) (*domain.Gathering, error)
+	FindInvitationByGatheringIDAndMemberID(ctx context.Context, gatheringID, memberID int64) (*domain.Invitation, error)
 
-	CreateGathering(domain.Gathering) (*domain.Gathering, error)
-	CreateInvitations(gatheringID int64, status string, memberID ...int64) error
-	CreateAttendee(domain.Attendee) (*domain.Attendee, error)
+	CreateGathering(ctx context.Context, arg domain.Gathering) (*domain.Gathering, error)
+	CreateInvitations(ctx context.Context, gatheringID int64, status string, memberID ...int64) error
+	CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error)
 }
 
 type GatheringService struct {
@@ -29,12 +30,12 @@ func NewGatheringService(repo gatheringRepo) *GatheringService {
 	}
 }
 
-func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
+func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
 	if req.Type == "INVITATION" && len(req.Attendees) < 1 {
 		return nil, errors.New("attendees must be more than 0 when type is invitation")
 	}
 
-	res, err := gs.gatheringRepo.CreateGathering(domain.Gathering{
+	res, err := gs.gatheringRepo.CreateGathering(ctx, domain.Gathering{
 		Creator:    req.Creator,
 		Type:       req.Type,
 		ScheduleAt: req.ScheduleAt,
@@ -46,7 +47,7 @@ func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.Cr
 	}
 
 	if req.Type == "INVITATION" {
-		if err := gs.gatheringRepo.CreateInvitations(res.ID, "WAITING", req.Attendees...); err != nil {
+		if err := gs.gatheringRepo.CreateInvitations(ctx, res.ID, "WAITING", req.Attendees...); err != nil {
 			return nil, err
 		}
 	}
@@ -56,19 +57,19 @@ func (gs *GatheringService) CreateGathering(req dto.CreateGatheringReq) (*dto.Cr
 	}, nil
 }
 
-func (gs *GatheringService) AttendGathering(req dto.CreateAttendeeReq) (*dto.CreateAttendeeRes, error) {
-	member, err := gs.gatheringRepo.FindMemberByID(req.MemberID)
+func (gs *GatheringService) AttendGathering(ctx context.Context, req dto.CreateAttendeeReq) (*dto.CreateAttendeeRes, error) {
+	member, err := gs.gatheringRepo.FindMemberByID(ctx, req.MemberID)
 	if err != nil {
 		return nil, err
 	}
 
-	gathering, err := gs.gatheringRepo.FindGatheringByID(req.GatheringID)
+	gathering, err := gs.gatheringRepo.FindGatheringByID(ctx, req.GatheringID)
 	if err != nil {
 		return nil, err
 	}
 
 	if gathering.Type == "INVITATION" {
-		invt, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(gathering.ID, member.ID)
+		invt, err := gs.gatheringRepo.FindInvitationByGatheringIDAndMemberID(ctx, gathering.ID, member.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +79,7 @@ func (gs *GatheringService) AttendGathering(req dto.CreateAttendeeReq) (*dto.Cre
 		}
 	}
 
-	res, err := gs.gatheringRepo.CreateAttendee(domain.Attendee{
+	res, err := gs.gatheringRepo.CreateAttendee(ctx, domain.Attendee{
 		MemberID:    member.ID,
 		GatheringID: gathering.ID,
 	})

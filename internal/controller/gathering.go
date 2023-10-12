@@ -26,7 +26,7 @@ func (mc *GatheringController) CreateGathering() gin.HandlerFunc {
 			return
 		}
 
-		res, err := mc.gatheringService.CreateGathering(json)
+		res, err := mc.gatheringService.CreateGathering(c.Request.Context(), json)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "cause": err.Error()})
 			return
@@ -44,7 +44,7 @@ func (mc *GatheringController) AttendGathering() gin.HandlerFunc {
 			return
 		}
 
-		res, err := mc.gatheringService.AttendGathering(json)
+		res, err := mc.gatheringService.AttendGathering(c.Request.Context(), json)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"status": "error", "cause": err.Error()})
 			return
