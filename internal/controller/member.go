@@ -1,18 +1,25 @@
 package controller
 
+//go:generate mockgen -source $GOFILE -destination ../../mock/controller/mock_$GOFILE -package $GOPACKAGE
+
 import (
+	"context"
 	"net/http"
 
 	"github.com/elangreza14/gathering/internal/dto"
-	service "github.com/elangreza14/gathering/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type MemberController struct {
-	memberService *service.MemberService
+type memberService interface {
+	CreateMember(ctx context.Context, req dto.CreateMemberReq) (*dto.CreateMemberRes, error)
+	RespondInvitation(ctx context.Context, req dto.RespondInvitationReq) error
 }
 
-func NewMemberController(service *service.MemberService) *MemberController {
+type MemberController struct {
+	memberService memberService
+}
+
+func NewMemberController(service memberService) *MemberController {
 	return &MemberController{
 		memberService: service,
 	}
