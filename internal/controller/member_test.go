@@ -44,7 +44,7 @@ func TestMemberControllerTestSuite(t *testing.T) {
 	suite.Run(t, new(TestMemberControllerSuite))
 }
 
-func (suite *TestMemberControllerSuite) TestMemberController_Register() {
+func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 	r := SetUpRouter()
 	memberController := controller.NewMemberController(suite.MockMemberService)
 	member := r.Group("/v1")
@@ -109,6 +109,74 @@ func (suite *TestMemberControllerSuite) TestMemberController_Register() {
 
 		responseData, _ := io.ReadAll(w.Body)
 		suite.Equal("{\"data\":{\"id\":1},\"status\":\"ok\"}", string(responseData))
+		suite.Equal(http.StatusCreated, w.Code)
+	})
+}
+
+func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation() {
+	r := SetUpRouter()
+	memberController := controller.NewMemberController(suite.MockMemberService)
+	member := r.Group("/v1")
+	member.PUT("/member/invitation", memberController.RespondInvitation())
+
+	requestBody := dto.RespondInvitationReq{
+		MemberID:     1,
+		InvitationID: 2,
+		Attend:       "ATTEND",
+	}
+	payload, _ := json.Marshal(requestBody)
+
+	suite.Run("error validation", func() {
+		requestBody := dto.RespondInvitationReq{
+			MemberID:     1,
+			InvitationID: 2,
+			Attend:       "test error attend",
+		}
+		payload, _ := json.Marshal(requestBody)
+
+		bodyReader := bytes.NewReader(payload)
+		req, _ := http.NewRequest(http.MethodPut, "/v1/member/invitation", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		responseData, _ := io.ReadAll(w.Body)
+		suite.Equal("{\"cause\":\"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(http.StatusBadRequest, w.Code)
+	})
+
+	suite.Run("error from service", func() {
+		suite.MockMemberService.EXPECT().RespondInvitation(gomock.Any(), gomock.Any()).Return(
+			errors.New("errors from db"),
+		)
+
+		bodyReader := bytes.NewReader(payload)
+		req, _ := http.NewRequest(http.MethodPut, "/v1/member/invitation", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		responseData, _ := io.ReadAll(w.Body)
+		suite.Equal("{\"cause\":\"errors from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(http.StatusInternalServerError, w.Code)
+	})
+
+	suite.Run("success", func() {
+		suite.MockMemberService.EXPECT().RespondInvitation(gomock.Any(), gomock.Any()).Return(
+			nil,
+		)
+
+		bodyReader := bytes.NewReader(payload)
+		req, _ := http.NewRequest(http.MethodPut, "/v1/member/invitation", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		responseData, _ := io.ReadAll(w.Body)
+		suite.Equal("{\"status\":\"ok\"}", string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }
