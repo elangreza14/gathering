@@ -3,6 +3,7 @@ package controller_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -49,14 +50,50 @@ func (suite *TestMemberControllerSuite) TestMemberController_Register() {
 	member := r.Group("/v1")
 	member.POST("/member", memberController.CreateMember())
 
-	suite.Run("success", func() {
+	requestBody := dto.CreateMemberReq{
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "test",
+	}
+	payload, _ := json.Marshal(requestBody)
+
+	suite.Run("error validation", func() {
 		requestBody := dto.CreateMemberReq{
 			FirstName: "test",
 			LastName:  "test",
-			Email:     "test",
 		}
 		payload, _ := json.Marshal(requestBody)
 
+		bodyReader := bytes.NewReader(payload)
+		req, _ := http.NewRequest(http.MethodPost, "/v1/member", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		responseData, _ := io.ReadAll(w.Body)
+		suite.Equal("{\"cause\":\"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(http.StatusBadRequest, w.Code)
+	})
+
+	suite.Run("error from service", func() {
+		suite.MockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(
+			nil, errors.New("errors from db"),
+		)
+
+		bodyReader := bytes.NewReader(payload)
+		req, _ := http.NewRequest(http.MethodPost, "/v1/member", bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		responseData, _ := io.ReadAll(w.Body)
+		suite.Equal("{\"cause\":\"errors from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(http.StatusInternalServerError, w.Code)
+	})
+
+	suite.Run("success", func() {
 		suite.MockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(
 			&dto.CreateMemberRes{
 				ID: 1,
