@@ -193,6 +193,23 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_AttendGathering() {
 		suite.Equal(err.Error(), "err from db")
 	})
 
+	suite.Run("error when find invitation", func() {
+		ctx := context.Background()
+		suite.MockGatheringRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
+			ID: 1,
+		}, nil)
+		suite.MockGatheringRepo.EXPECT().FindGatheringByID(ctx, gomock.Any()).Return(&domain.Gathering{
+			ID:   1,
+			Type: "INVITATION",
+		}, nil)
+		suite.MockGatheringRepo.EXPECT().FindInvitationByGatheringIDAndMemberID(ctx, gomock.Any(), gomock.Any()).Return(
+			nil, errors.New("err from db"))
+
+		_, err := suite.Cs.AttendGathering(ctx, suite.MockTimePassed, suite.MockCreateAttendeeReq)
+		suite.Error(err)
+		suite.Equal(err.Error(), "err from db")
+	})
+
 	suite.Run("success with type is invitation", func() {
 		ctx := context.Background()
 		suite.MockGatheringRepo.EXPECT().FindMemberByID(ctx, gomock.Any()).Return(&domain.Member{
