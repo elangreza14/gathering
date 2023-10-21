@@ -1,0 +1,116 @@
+basePath: /v1
+definitions:
+  dto.CreateMemberRes:
+    properties:
+      id:
+        type: integer
+    type: object
+  dto.ErrorField:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error: {}
+      result:
+        type: string
+    type: object
+  dto.SuccessResponse:
+    properties:
+      data: {}
+      error: {}
+      result:
+        type: string
+    type: object
+  dto.SuccessResponsePlain:
+    properties:
+      result:
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact:
+    email: rezaelangerlangga14@gmail.com
+    name: API Support
+    url: https://github.com/elangreza14/gathering
+  description: This is a sample server Gathering server.
+  title: Gathering API
+  version: "1.0"
+paths:
+  /member:
+    post:
+      consumes:
+      - application/json
+      description: create member
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateMemberRes'
+              type: object
+        "400":
+          description: error validation
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/dto.ErrorField'
+              type: object
+        "500":
+          description: error internal
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: create member
+      tags:
+      - member
+  /member/invitation:
+    post:
+      consumes:
+      - application/json
+      description: create member
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/dto.SuccessResponsePlain'
+        "400":
+          description: error validation
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  items:
+                    $ref: '#/definitions/dto.ErrorField'
+                  type: array
+              type: object
+        "500":
+          description: error internal
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: create member
+      tags:
+      - member
+swagger: "2.0"

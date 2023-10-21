@@ -72,7 +72,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag","status":"error"}`, string(responseData))
+		suite.Equal(`{"cause":"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag","result":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -89,7 +89,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"errors from db","status":"error"}`, string(responseData))
+		suite.Equal(`{"cause":"errors from db","result":"error"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
@@ -108,7 +108,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"data":{"id":1},"status":"ok"}`, string(responseData))
+		suite.Equal(`{"data":{"id":1},"result":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }
@@ -142,7 +142,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag","status":"error"}`, string(responseData))
+		suite.Equal(`{"cause":"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag","result":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -159,7 +159,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"errors from db","status":"error"}`, string(responseData))
+		suite.Equal(`{"cause":"errors from db","result":"error"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
@@ -176,7 +176,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"status":"ok"}`, string(responseData))
+		suite.Equal(`{"result":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }

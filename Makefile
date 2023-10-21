@@ -42,6 +42,10 @@ install-go-test-coverage:
 check-coverage: install-go-test-coverage
 	go test ./... -coverprofile=./coverage.out -covermode=atomic -coverpkg=./...
 	${GOBIN}/go-test-coverage --config=./.github/.testcoverage.yml
+	go tool cover -html=coverage.out
+
+test-coverage:
+	 go test -coverprofile=coverage.out ./... ; go tool cover -html=coverage.out
 
 mock:
 	go generate ./...

@@ -1,6 +1,6 @@
 // Package Main is ...
 //
-//nolint:errcheck
+//nolint:errcheck,godot
 package main
 
 import (
@@ -11,15 +11,19 @@ import (
 	"os"
 	"time"
 
+	docs "github.com/elangreza14/gathering/docs"
 	controller "github.com/elangreza14/gathering/internal/controller"
 	repo "github.com/elangreza14/gathering/internal/postgres"
 	service "github.com/elangreza14/gathering/internal/service"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type (
@@ -35,6 +39,16 @@ type (
 	}
 )
 
+// @title Gathering API
+// @version 1.0
+// @description This is a sample server Gathering server.
+
+// @contact.name API Support
+// @contact.url https://github.com/elangreza14/gathering
+// @contact.email rezaelangerlangga14@gmail.com
+
+// @host localhost:5000
+// @BasePath /v1
 func main() {
 	db, err := setup()
 	if err != nil {
@@ -42,10 +56,13 @@ func main() {
 	}
 
 	repo := repo.NewRepoPostgres(db)
-
 	router := gin.Default()
+	router.Use(gzip.Gzip(gzip.BestSpeed))
+
+	// v1
 	v1 := router.Group("/v1")
 
+	// dependency injection
 	memberController := controller.NewMemberController(service.NewMemberService(repo))
 	member := v1.Group("/member")
 	member.POST("/", memberController.CreateMember())
@@ -55,6 +72,11 @@ func main() {
 	gathering := v1.Group("/gathering")
 	gathering.POST("/", gatheringController.CreateGathering())
 	gathering.PUT("/attends", gatheringController.AttendGathering())
+
+	// swagger
+	// can be access in this url http://localhost:5000/swagger/index.html
+	docs.SwaggerInfo.BasePath = "/v1"
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Run(":5000")
 }

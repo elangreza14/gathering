@@ -70,7 +70,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"Key: 'CreateGatheringReq.Creator' Error:Field validation for 'Creator' failed on the 'required' tag\nKey: 'CreateGatheringReq.Type' Error:Field validation for 'Type' failed on the 'oneof' tag\nKey: 'CreateGatheringReq.ScheduleAt' Error:Field validation for 'ScheduleAt' failed on the 'required' tag\nKey: 'CreateGatheringReq.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'CreateGatheringReq.Location' Error:Field validation for 'Location' failed on the 'required' tag","status":"error"}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"Creator","message":"This field is required"},{"field":"Type","message":"Unknown error"},{"field":"ScheduleAt","message":"This field is required"},{"field":"Name","message":"This field is required"},{"field":"Location","message":"This field is required"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -86,7 +86,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"error from db","status":"error"}`, string(responseData))
+		suite.Equal(`{"result":"error","error":"error from db"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
@@ -104,7 +104,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"data":{"id":1},"status":"ok"}`, string(responseData))
+		suite.Equal(`{"data":{"id":1},"result":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }
@@ -135,7 +135,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_AttendGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":[{"field":"GatheringID","message":"This field is required"}],"status":"error"}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"GatheringID","message":"This field is required"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -152,7 +152,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_AttendGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"error from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"result":"error","error":"error from db"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
