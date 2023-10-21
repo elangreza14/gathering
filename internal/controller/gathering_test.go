@@ -70,7 +70,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"result":"errors","error":[{"field":"Creator","message":"This field is required"},{"field":"Type","message":"Unknown error"},{"field":"ScheduleAt","message":"This field is required"},{"field":"Name","message":"This field is required"},{"field":"Location","message":"This field is required"}]}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"Creator","message":"This field is required"},{"field":"Type","message":"Should be FREE or INVITATION"},{"field":"ScheduleAt","message":"This field is required"},{"field":"Name","message":"This field is required"},{"field":"Location","message":"This field is required"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 

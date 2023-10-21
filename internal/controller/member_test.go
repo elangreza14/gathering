@@ -142,7 +142,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"result":"errors","error":[{"field":"Atteand","message":"Unknown error"}]}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"Attend","message":"Should be ATTEND or ABSENT"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
