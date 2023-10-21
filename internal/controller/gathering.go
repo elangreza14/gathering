@@ -29,7 +29,19 @@ func NewGatheringController(service gatheringService) *GatheringController {
 	}
 }
 
-// CreateGathering ...
+// CreateGathering is ...
+// CreateGathering godoc
+//
+//	@Summary		create gathering
+//	@Description	create gathering
+//	@Tags			gathering
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.CreateGatheringReq								true	"test"
+//	@success		200		{object}	dto.SuccessResponse{data=dto.CreateGatheringRes}	"success"
+//	@Failure		400		{object}	dto.ErrorResponse{error=[]dto.ErrorField}			"error validation"
+//	@Failure		500		{object}	dto.ErrorResponse{error=string}						"error internal"
+//	@Router			/gathering [post]
 func (mc *GatheringController) CreateGathering() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.CreateGatheringReq
@@ -49,6 +61,18 @@ func (mc *GatheringController) CreateGathering() gin.HandlerFunc {
 }
 
 // AttendGathering is ...
+// AttendGathering godoc
+//
+//	@Summary		create gathering invitation
+//	@Description	create gathering invitation
+//	@Tags			gathering
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.CreateAttendeeReq							true	"body"
+//	@success		200		{object}	dto.SuccessResponse{data=dto.CreateAttendeeRes}	"success"
+//	@Failure		400		{object}	dto.ErrorResponse{error=[]dto.ErrorField}		"error validation"
+//	@Failure		500		{object}	dto.ErrorResponse{error=string}					"error internal"
+//	@Router			/gathering/invitation [post]
 func (mc *GatheringController) AttendGathering() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.CreateAttendeeReq

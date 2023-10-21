@@ -39,16 +39,16 @@ type (
 	}
 )
 
-// @title Gathering API
-// @version 1.0
-// @description This is a sample server Gathering server.
+//	@title			Gathering API
+//	@version		1.0
+//	@description	This is a sample server Gathering server.
 
-// @contact.name API Support
-// @contact.url https://github.com/elangreza14/gathering
-// @contact.email rezaelangerlangga14@gmail.com
+//	@contact.name	API Support
+//	@contact.url	https://github.com/elangreza14/gathering
+//	@contact.email	rezaelangerlangga14@gmail.com
 
-// @host localhost:5000
-// @BasePath /v1
+//	@host		localhost:5000
+//	@BasePath	/v1
 func main() {
 	db, err := setup()
 	if err != nil {

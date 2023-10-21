@@ -13,6 +13,176 @@
     "host": "localhost:5000",
     "basePath": "/v1",
     "paths": {
+        "/gathering": {
+            "post": {
+                "description": "create gathering",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gathering"
+                ],
+                "summary": "create gathering",
+                "parameters": [
+                    {
+                        "description": "test",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateGatheringReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CreateGatheringRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error validation",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.ErrorResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ErrorField"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "error internal",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.ErrorResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/gathering/invitation": {
+            "post": {
+                "description": "create gathering invitation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gathering"
+                ],
+                "summary": "create gathering invitation",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateAttendeeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CreateAttendeeRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "error validation",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.ErrorResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ErrorField"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "error internal",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.ErrorResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/member": {
             "post": {
                 "description": "create member",
@@ -26,6 +196,17 @@
                     "member"
                 ],
                 "summary": "create member",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateMemberReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -56,7 +237,10 @@
                                     "type": "object",
                                     "properties": {
                                         "error": {
-                                            "$ref": "#/definitions/dto.ErrorField"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ErrorField"
+                                            }
                                         }
                                     }
                                 }
@@ -97,6 +281,17 @@
                     "member"
                 ],
                 "summary": "create member",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RespondInvitationReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -148,6 +343,123 @@
         }
     },
     "definitions": {
+        "domain.GatheringType": {
+            "type": "string",
+            "enum": [
+                "FREE",
+                "INVITATION"
+            ],
+            "x-enum-varnames": [
+                "GatheringTypeFREE",
+                "GatheringTypeINVITATION"
+            ]
+        },
+        "domain.InvitationStatus": {
+            "type": "string",
+            "enum": [
+                "WAITING",
+                "ATTEND",
+                "ABSENT"
+            ],
+            "x-enum-varnames": [
+                "InvitationStatusWAITING",
+                "InvitationStatusATTEND",
+                "InvitationStatusABSENT"
+            ]
+        },
+        "dto.CreateAttendeeReq": {
+            "type": "object",
+            "required": [
+                "gathering_id",
+                "member_id"
+            ],
+            "properties": {
+                "gathering_id": {
+                    "type": "integer"
+                },
+                "member_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateAttendeeRes": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateGatheringReq": {
+            "type": "object",
+            "required": [
+                "creator",
+                "location",
+                "name",
+                "schedule_at"
+            ],
+            "properties": {
+                "attendees": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "creator": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "schedule_at": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "FREE",
+                        "INVITATION"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.GatheringType"
+                        }
+                    ]
+                }
+            }
+        },
+        "dto.CreateGatheringRes": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateMemberReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateMemberRes": {
             "type": "object",
             "properties": {
@@ -173,6 +485,32 @@
                 "error": {},
                 "result": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.RespondInvitationReq": {
+            "type": "object",
+            "required": [
+                "invitation_id",
+                "member_id"
+            ],
+            "properties": {
+                "attend": {
+                    "enum": [
+                        "ATTEND",
+                        "ABSENT"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.InvitationStatus"
+                        }
+                    ]
+                },
+                "invitation_id": {
+                    "type": "integer"
+                },
+                "member_id": {
+                    "type": "integer"
                 }
             }
         },

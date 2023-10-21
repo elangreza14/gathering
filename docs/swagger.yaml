@@ -1,5 +1,84 @@
 basePath: /v1
 definitions:
+  domain.GatheringType:
+    enum:
+    - FREE
+    - INVITATION
+    type: string
+    x-enum-varnames:
+    - GatheringTypeFREE
+    - GatheringTypeINVITATION
+  domain.InvitationStatus:
+    enum:
+    - WAITING
+    - ATTEND
+    - ABSENT
+    type: string
+    x-enum-varnames:
+    - InvitationStatusWAITING
+    - InvitationStatusATTEND
+    - InvitationStatusABSENT
+  dto.CreateAttendeeReq:
+    properties:
+      gathering_id:
+        type: integer
+      member_id:
+        type: integer
+    required:
+    - gathering_id
+    - member_id
+    type: object
+  dto.CreateAttendeeRes:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  dto.CreateGatheringReq:
+    properties:
+      attendees:
+        items:
+          type: integer
+        type: array
+      creator:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      schedule_at:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/domain.GatheringType'
+        enum:
+        - FREE
+        - INVITATION
+    required:
+    - creator
+    - location
+    - name
+    - schedule_at
+    type: object
+  dto.CreateGatheringRes:
+    properties:
+      id:
+        type: integer
+    type: object
+  dto.CreateMemberReq:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    type: object
   dto.CreateMemberRes:
     properties:
       id:
@@ -17,6 +96,22 @@ definitions:
       error: {}
       result:
         type: string
+    type: object
+  dto.RespondInvitationReq:
+    properties:
+      attend:
+        allOf:
+        - $ref: '#/definitions/domain.InvitationStatus'
+        enum:
+        - ATTEND
+        - ABSENT
+      invitation_id:
+        type: integer
+      member_id:
+        type: integer
+    required:
+    - invitation_id
+    - member_id
     type: object
   dto.SuccessResponse:
     properties:
@@ -40,11 +135,112 @@ info:
   title: Gathering API
   version: "1.0"
 paths:
+  /gathering:
+    post:
+      consumes:
+      - application/json
+      description: create gathering
+      parameters:
+      - description: test
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGatheringReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateGatheringRes'
+              type: object
+        "400":
+          description: error validation
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  items:
+                    $ref: '#/definitions/dto.ErrorField'
+                  type: array
+              type: object
+        "500":
+          description: error internal
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: create gathering
+      tags:
+      - gathering
+  /gathering/invitation:
+    post:
+      consumes:
+      - application/json
+      description: create gathering invitation
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAttendeeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateAttendeeRes'
+              type: object
+        "400":
+          description: error validation
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  items:
+                    $ref: '#/definitions/dto.ErrorField'
+                  type: array
+              type: object
+        "500":
+          description: error internal
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: create gathering invitation
+      tags:
+      - gathering
   /member:
     post:
       consumes:
       - application/json
       description: create member
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMemberReq'
       produces:
       - application/json
       responses:
@@ -64,7 +260,9 @@ paths:
             - $ref: '#/definitions/dto.ErrorResponse'
             - properties:
                 error:
-                  $ref: '#/definitions/dto.ErrorField'
+                  items:
+                    $ref: '#/definitions/dto.ErrorField'
+                  type: array
               type: object
         "500":
           description: error internal
@@ -83,6 +281,13 @@ paths:
       consumes:
       - application/json
       description: create member
+      parameters:
+      - description: body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RespondInvitationReq'
       produces:
       - application/json
       responses:

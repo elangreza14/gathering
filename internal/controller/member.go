@@ -30,15 +30,17 @@ func NewMemberController(service memberService) *MemberController {
 
 // CreateMember is ...
 // CreateMember godoc
-// @Summary      create member
-// @Description  create member
-// @Tags         member
-// @Accept       json
-// @Produce      json
-// @success 200 {object} dto.SuccessResponse{data=dto.CreateMemberRes} "success"
-// @Failure 400 {object} dto.ErrorResponse{error=[]dto.ErrorField} "error validation"
-// @Failure 500 {object} dto.ErrorResponse{error=string} "error internal"
-// @Router       /member [post]
+//
+//	@Summary		create member
+//	@Description	create member
+//	@Tags			member
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.CreateMemberReq								true	"body"
+//	@success		200		{object}	dto.SuccessResponse{data=dto.CreateMemberRes}	"success"
+//	@Failure		400		{object}	dto.ErrorResponse{error=[]dto.ErrorField}		"error validation"
+//	@Failure		500		{object}	dto.ErrorResponse{error=string}					"error internal"
+//	@Router			/member [post]
 func (mc *MemberController) CreateMember() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.CreateMemberReq
@@ -57,17 +59,19 @@ func (mc *MemberController) CreateMember() gin.HandlerFunc {
 	}
 }
 
-// RespondInvitation ...
-// CreateMember godoc
-// @Summary      create member
-// @Description  create member
-// @Tags         member
-// @Accept       json
-// @Produce      json
-// @success 200 {object} dto.SuccessResponsePlain{} "success"
-// @Failure 400 {object} dto.ErrorResponse{error=[]dto.ErrorField} "error validation"
-// @Failure 500 {object} dto.ErrorResponse{error=string} "error internal"
-// @Router       /member/invitation [post]
+// RespondInvitation is ...
+// RespondInvitation godoc
+//
+//	@Summary		create member
+//	@Description	create member
+//	@Tags			member
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.RespondInvitationReq					true	"body"
+//	@success		200		{object}	dto.SuccessResponsePlain{}					"success"
+//	@Failure		400		{object}	dto.ErrorResponse{error=[]dto.ErrorField}	"error validation"
+//	@Failure		500		{object}	dto.ErrorResponse{error=string}				"error internal"
+//	@Router			/member/invitation [post]
 func (mc *MemberController) RespondInvitation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.RespondInvitationReq

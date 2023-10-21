@@ -2,6 +2,7 @@ GO ?= go
 GOBIN ?= $$($(GO) env GOPATH)/bin
 GOLANGCI_LINT ?= $(GOBIN)/golangci-lint
 GOLANG_TEST_COVERAGE ?= $(GOBIN)/golang-test-coverage
+GOLANG_SWAG ?= $(GOBIN)/swag
 GOLANGCI_LINT_VERSION ?= v1.52.2
 
 #!make
@@ -16,7 +17,12 @@ up:
 down:
 	docker-compose --env-file local.env down
 
-run-local:
+install-swag:
+	test -f $(GOLANG_SWAG) || go install github.com/swaggo/swag/cmd/swag@latest
+
+run-local: install-swag
+	swag init -g cmd/server/main.go
+	swag fmt
 	MODE=local go run cmd/server/main.go
 	
 run-live:
@@ -45,7 +51,7 @@ check-coverage: install-go-test-coverage
 	go tool cover -html=coverage.out
 
 test-coverage:
-	 go test -coverprofile=coverage.out ./... ; go tool cover -html=coverage.out
+	go test -coverprofile=coverage.out ./... ; go tool cover -html=coverage.out
 
 mock:
 	go generate ./...
@@ -59,4 +65,4 @@ migrate-create:
 	@read -p  "What is the name of migration?" NAME; \
 	migrate create -ext sql -tz Asia/Jakarta -dir ${MIGRATION_FOLDER} -format "20060102150405" $$NAME
 
-.PHONY: get-golangcilint lint test tidy check-coverage up-stack up down run-local run-live mock migrate-down migrate-create install-go-test-coverage
+.PHONY: get-golangcilint lint test tidy check-coverage up-stack up down run-local run-live mock migrate-down migrate-create install-go-test-coverage install-swag run-swag
