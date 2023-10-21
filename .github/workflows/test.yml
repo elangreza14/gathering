@@ -16,7 +16,7 @@ jobs:
       - name: test
         run: make test
       - name: generate test coverage
-        run: go test ./... -coverprofile=./cover.out -covermode=atomic
+        run: go test ./... -coverprofile=./coverage.out -covermode=atomic
       - name: check test coverage
         id: coverage
         uses: vladopajic/go-test-coverage@v2
