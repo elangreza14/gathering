@@ -3,6 +3,7 @@ package dto
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -64,10 +65,20 @@ func getErrorMsg(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
 		return "This field is required"
-	case "lte":
-		return "Should be less than " + fe.Param()
-	case "gte":
-		return "Should be greater than " + fe.Param()
+	case "oneof":
+		option := strings.Split(fe.Param(), " ")
+		opt := ""
+		for i := 0; i < len(option); i++ {
+			if i == len(option)-1 {
+				opt += " or "
+			} else if i != 0 {
+				opt += ", "
+			}
+			opt += option[i]
+		}
+		return "Should be " + opt
+		// case "gte":
+		// 	return "Should be greater than " + fe.Param()
 	}
 	return "Unknown error"
 }

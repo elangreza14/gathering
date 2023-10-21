@@ -105,6 +105,7 @@ definitions:
         enum:
         - ATTEND
         - ABSENT
+        - asas
       invitation_id:
         type: integer
       member_id:

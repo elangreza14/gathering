@@ -504,7 +504,8 @@ const docTemplate = `{
                 "attend": {
                     "enum": [
                         "ATTEND",
-                        "ABSENT"
+                        "ABSENT",
+                        "asas"
                     ],
                     "allOf": [
                         {

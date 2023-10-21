@@ -498,7 +498,8 @@
                 "attend": {
                     "enum": [
                         "ATTEND",
-                        "ABSENT"
+                        "ABSENT",
+                        "asas"
                     ],
                     "allOf": [
                         {

@@ -47,8 +47,8 @@ type (
 //	@contact.url	https://github.com/elangreza14/gathering
 //	@contact.email	rezaelangerlangga14@gmail.com
 
-//	@host		localhost:5000
-//	@BasePath	/v1
+// @host		localhost:5000
+// @BasePath	/v1
 func main() {
 	db, err := setup()
 	if err != nil {
@@ -75,6 +75,7 @@ func main() {
 
 	// swagger
 	// can be access in this url http://localhost:5000/swagger/index.html
+	// https://github.com/swaggo/swag/blob/master/README.md#how-to-use-it-with-gin
 	docs.SwaggerInfo.BasePath = "/v1"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
