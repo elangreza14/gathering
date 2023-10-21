@@ -1,3 +1,4 @@
+// Package controller is ...
 package controller
 
 //go:generate mockgen -source $GOFILE -destination ../../mock/controller/mock_$GOFILE -package $GOPACKAGE
@@ -15,16 +16,19 @@ type memberService interface {
 	RespondInvitation(ctx context.Context, req dto.RespondInvitationReq) error
 }
 
+// MemberController is ..
 type MemberController struct {
 	memberService memberService
 }
 
+// NewMemberController is ...
 func NewMemberController(service memberService) *MemberController {
 	return &MemberController{
 		memberService: service,
 	}
 }
 
+// CreateMember is ...
 func (mc *MemberController) CreateMember() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.CreateMemberReq
@@ -43,6 +47,7 @@ func (mc *MemberController) CreateMember() gin.HandlerFunc {
 	}
 }
 
+// RespondInvitation ...
 func (mc *MemberController) RespondInvitation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var json dto.RespondInvitationReq

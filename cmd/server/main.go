@@ -1,14 +1,18 @@
+// Package Main is ...
+//
+//nolint:errcheck
 package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	controller "github.com/elangreza14/gathering/internal/controller"
-	repoPostgres "github.com/elangreza14/gathering/internal/repo"
+	repo "github.com/elangreza14/gathering/internal/postgres"
 	service "github.com/elangreza14/gathering/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -19,7 +23,7 @@ import (
 )
 
 type (
-	// Env is list all of env
+	// Env is list all of env.
 	Env struct {
 		PostgresHostname string `mapstructure:"POSTGRES_HOSTNAME"`
 		PostgresSsl      string `mapstructure:"POSTGRES_SSL"`
@@ -37,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := repoPostgres.New(db)
+	repo := repo.NewRepoPostgres(db)
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
@@ -78,34 +82,37 @@ func setup() (*sql.DB, error) {
 		return nil, err
 	}
 
-	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
+	dbURL := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=%v",
 		env.PostgresUser,
 		env.PostgresPassword,
 		env.PostgresHostname,
 		env.PostgresPort,
 		env.PostgresDB,
 		env.PostgresSsl)
-	db, err := sql.Open("postgres", dbUrl)
+	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		return nil, err
 	}
 
 	migration, err := migrate.New(
-		fmt.Sprintf("file://%v", env.MigrationFolder), dbUrl)
+		fmt.Sprintf("file://%v", env.MigrationFolder), dbURL)
 	if err != nil {
 		return nil, err
 	}
 
 	// apply migration to DB
-	if err := migration.Up(); err != nil {
-		if err != migrate.ErrNoChange {
+	if err = migration.Up(); err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
 			return nil, err
 		}
 	}
 
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(25)
-	db.SetConnMaxLifetime(5 * time.Minute)
+	const maxConn = 25
+	const maxLifeTime = 5 * time.Minute
+
+	db.SetMaxOpenConns(maxConn)
+	db.SetMaxIdleConns(maxConn)
+	db.SetConnMaxLifetime(maxLifeTime)
 
 	return db, nil
 }

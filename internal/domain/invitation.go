@@ -1,8 +1,11 @@
 package domain
 
 type (
+	// InvitationStatus is ...
 	InvitationStatus string
-	Invitation       struct {
+
+	// Invitation is ...
+	Invitation struct {
 		ID          int64
 		MemberID    int64
 		GatheringID int64
@@ -11,7 +14,10 @@ type (
 )
 
 const (
+	// InvitationStatusWAITING is ...
 	InvitationStatusWAITING InvitationStatus = "WAITING"
-	InvitationStatusATTEND  InvitationStatus = "ATTEND"
-	InvitationStatusABSENT  InvitationStatus = "ABSENT"
+	// InvitationStatusATTEND is ...
+	InvitationStatusATTEND InvitationStatus = "ATTEND"
+	// InvitationStatusABSENT is ...
+	InvitationStatusABSENT InvitationStatus = "ABSENT"
 )

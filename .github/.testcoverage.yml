@@ -1,0 +1,13 @@
+profile: coverage.out
+local-prefix: "github.com/elangreza14/gathering"
+threshold:
+  file: 40
+  package: 40
+  total: 40
+exclude:
+  paths:
+    - ^mock
+    - ^internal/domain
+    - ^internal/dto
+    - ^migrations
+    - ^cmd

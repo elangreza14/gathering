@@ -3,8 +3,11 @@ package domain
 import "time"
 
 type (
+	// GatheringType is ...
 	GatheringType string
-	Gathering     struct {
+
+	// Gathering is ...
+	Gathering struct {
 		ID         int64
 		Creator    string
 		Type       GatheringType
@@ -15,6 +18,8 @@ type (
 )
 
 const (
-	GatheringTypeFREE       GatheringType = "FREE"
+	// GatheringTypeFREE ...
+	GatheringTypeFREE GatheringType = "FREE"
+	// GatheringTypeINVITATION ...
 	GatheringTypeINVITATION GatheringType = "INVITATION"
 )

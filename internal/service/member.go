@@ -19,16 +19,19 @@ type memberRepo interface {
 	UpdateInvitation(ctx context.Context, arg domain.Invitation) error
 }
 
+// MemberService ...
 type MemberService struct {
 	memberRepo memberRepo
 }
 
+// NewMemberService ...
 func NewMemberService(repo memberRepo) *MemberService {
 	return &MemberService{
 		memberRepo: repo,
 	}
 }
 
+// CreateMember is ...
 func (is *MemberService) CreateMember(ctx context.Context, req dto.CreateMemberReq) (*dto.CreateMemberRes, error) {
 	res, err := is.memberRepo.CreateMember(ctx, domain.Member{
 		FirstName: req.FirstName,
@@ -44,6 +47,7 @@ func (is *MemberService) CreateMember(ctx context.Context, req dto.CreateMemberR
 	}, nil
 }
 
+// RespondInvitation is ...
 func (is *MemberService) RespondInvitation(ctx context.Context, req dto.RespondInvitationReq) error {
 	member, err := is.memberRepo.FindMemberByID(ctx, req.MemberID)
 	if err != nil {

@@ -19,11 +19,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-// func SetUpRouter() *gin.Engine {
-// 	router := gin.Default()
-// 	return router
-// }
-
 type TestGatheringControllerSuite struct {
 	suite.Suite
 
@@ -61,14 +56,13 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 	payload, _ := json.Marshal(requestBody)
 
 	suite.Run("error from validation", func() {
-
-		requestBody := dto.CreateGatheringReq{
+		errRequestBody := dto.CreateGatheringReq{
 			Creator: "",
 			Type:    "",
 		}
-		payload, _ := json.Marshal(requestBody)
+		errPayload, _ := json.Marshal(errRequestBody)
 
-		bodyReader := bytes.NewReader(payload)
+		bodyReader := bytes.NewReader(errPayload)
 		req, _ := http.NewRequest(http.MethodPut, "/v1/gathering", bodyReader)
 		req.Header.Set("Content-Type", "application/json")
 
@@ -76,13 +70,13 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"Key: 'CreateGatheringReq.Creator' Error:Field validation for 'Creator' failed on the 'required' tag\\nKey: 'CreateGatheringReq.Type' Error:Field validation for 'Type' failed on the 'oneof' tag\\nKey: 'CreateGatheringReq.ScheduleAt' Error:Field validation for 'ScheduleAt' failed on the 'required' tag\\nKey: 'CreateGatheringReq.Name' Error:Field validation for 'Name' failed on the 'required' tag\\nKey: 'CreateGatheringReq.Location' Error:Field validation for 'Location' failed on the 'required' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"Key: 'CreateGatheringReq.Creator' Error:Field validation for 'Creator' failed on the 'required' tag\nKey: 'CreateGatheringReq.Type' Error:Field validation for 'Type' failed on the 'oneof' tag\nKey: 'CreateGatheringReq.ScheduleAt' Error:Field validation for 'ScheduleAt' failed on the 'required' tag\nKey: 'CreateGatheringReq.Name' Error:Field validation for 'Name' failed on the 'required' tag\nKey: 'CreateGatheringReq.Location' Error:Field validation for 'Location' failed on the 'required' tag","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
 	suite.Run("error from service", func() {
-
-		suite.MockGatheringService.EXPECT().CreateGathering(gomock.Any(), gomock.Any()).Return(nil, errors.New("error from db"))
+		suite.MockGatheringService.EXPECT().
+			CreateGathering(gomock.Any(), gomock.Any()).Return(nil, errors.New("error from db"))
 
 		bodyReader := bytes.NewReader(payload)
 		req, _ := http.NewRequest(http.MethodPut, "/v1/gathering", bodyReader)
@@ -92,12 +86,11 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"error from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"error from db","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
 	suite.Run("success", func() {
-
 		suite.MockGatheringService.EXPECT().CreateGathering(gomock.Any(), gomock.Any()).Return(
 			&dto.CreateGatheringRes{
 				ID: 1,
@@ -111,7 +104,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_CreateGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"data\":{\"id\":1},\"status\":\"ok\"}", string(responseData))
+		suite.Equal(`{"data":{"id":1},"status":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }
@@ -129,13 +122,12 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_AttendGatheri
 	payload, _ := json.Marshal(requestBody)
 
 	suite.Run("error from validation", func() {
-
-		requestBody := dto.CreateAttendeeReq{
+		errRequestBody := dto.CreateAttendeeReq{
 			MemberID: 1,
 		}
-		payload, _ := json.Marshal(requestBody)
+		errPayload, _ := json.Marshal(errRequestBody)
 
-		bodyReader := bytes.NewReader(payload)
+		bodyReader := bytes.NewReader(errPayload)
 		req, _ := http.NewRequest(http.MethodPut, "/v1/gathering/invitation", bodyReader)
 		req.Header.Set("Content-Type", "application/json")
 
@@ -143,7 +135,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_AttendGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"Key: 'CreateAttendeeReq.GatheringID' Error:Field validation for 'GatheringID' failed on the 'required' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":[{"field":"GatheringID","message":"This field is required"}],"status":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 

@@ -1,3 +1,9 @@
+GO ?= go
+GOBIN ?= $$($(GO) env GOPATH)/bin
+GOLANGCI_LINT ?= $(GOBIN)/golangci-lint
+GOLANG_TEST_COVERAGE ?= $(GOBIN)/golang-test-coverage
+GOLANGCI_LINT_VERSION ?= v1.52.2
+
 #!make
 include local.env
 
@@ -16,11 +22,26 @@ run-local:
 run-live:
 	go run cmd/server/main.go
 
-test:
-	 go test -coverprofile=coverage.out ./... ; go tool cover -html=coverage.out
-	
-lint:
-	gofumpt -l -w .
+get-golangcilint:
+	test -f $(GOLANGCI_LINT) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$($(GO) env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+
+lint: get-golangcilint
+	$(GOLANGCI_LINT) run ./...
+
+test: 
+	go test -timeout=3s -race -count=10 -failfast -short ./...
+	go test -timeout=3s -race -count=1 -failfast ./...
+
+tidy:
+	go mod tidy
+	go fmt ./...
+
+install-go-test-coverage:
+	test -f $(GOLANG_TEST_COVERAGE) || go install github.com/vladopajic/go-test-coverage/v2@latest
+
+check-coverage: install-go-test-coverage
+	go test ./... -coverprofile=./coverage.out -covermode=atomic -coverpkg=./...
+	${GOBIN}/go-test-coverage --config=./.github/.testcoverage.yml
 
 mock:
 	go generate ./...
@@ -34,4 +55,4 @@ migrate-create:
 	@read -p  "What is the name of migration?" NAME; \
 	migrate create -ext sql -tz Asia/Jakarta -dir ${MIGRATION_FOLDER} -format "20060102150405" $$NAME
 
-.PHONY: up-stack up down run-local run-live mock lint test migrate-down migrate-create
+.PHONY: get-golangcilint lint test tidy check-coverage up-stack up down run-local run-live mock migrate-down migrate-create install-go-test-coverage

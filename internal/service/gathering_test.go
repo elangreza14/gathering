@@ -77,7 +77,8 @@ func (suite *TestGatheringServiceSuite) TestGatheringService_CreateGathering() {
 		suite.MockGatheringRepo.EXPECT().CreateGathering(ctx, gomock.Any()).Return(&domain.Gathering{
 			ID: 1,
 		}, nil)
-		suite.MockGatheringRepo.EXPECT().CreateInvitations(ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("err from db"))
+		suite.MockGatheringRepo.EXPECT().
+			CreateInvitations(ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("err from db"))
 
 		_, err := suite.Cs.CreateGathering(ctx, suite.MockCreateGatheringReq)
 		suite.Error(err)

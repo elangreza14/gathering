@@ -58,13 +58,13 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 	payload, _ := json.Marshal(requestBody)
 
 	suite.Run("error validation", func() {
-		requestBody := dto.CreateMemberReq{
+		errRequestBody := dto.CreateMemberReq{
 			FirstName: "test",
 			LastName:  "test",
 		}
-		payload, _ := json.Marshal(requestBody)
+		errPayload, _ := json.Marshal(errRequestBody)
 
-		bodyReader := bytes.NewReader(payload)
+		bodyReader := bytes.NewReader(errPayload)
 		req, _ := http.NewRequest(http.MethodPost, "/v1/member", bodyReader)
 		req.Header.Set("Content-Type", "application/json")
 
@@ -72,7 +72,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -89,7 +89,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"errors from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"errors from db","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
@@ -108,7 +108,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"data\":{\"id\":1},\"status\":\"ok\"}", string(responseData))
+		suite.Equal(`{"data":{"id":1},"status":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }
@@ -127,14 +127,14 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 	payload, _ := json.Marshal(requestBody)
 
 	suite.Run("error validation", func() {
-		requestBody := dto.RespondInvitationReq{
+		errRequestBody := dto.RespondInvitationReq{
 			MemberID:     1,
 			InvitationID: 2,
 			Attend:       "test error attend",
 		}
-		payload, _ := json.Marshal(requestBody)
+		errPayload, _ := json.Marshal(errRequestBody)
 
-		bodyReader := bytes.NewReader(payload)
+		bodyReader := bytes.NewReader(errPayload)
 		req, _ := http.NewRequest(http.MethodPut, "/v1/member/invitation", bodyReader)
 		req.Header.Set("Content-Type", "application/json")
 
@@ -142,7 +142,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -159,7 +159,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"cause\":\"errors from db\",\"status\":\"error\"}", string(responseData))
+		suite.Equal(`{"cause":"errors from db","status":"error"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 
@@ -176,7 +176,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"status\":\"ok\"}", string(responseData))
+		suite.Equal(`{"status":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }

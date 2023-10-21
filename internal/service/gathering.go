@@ -1,3 +1,4 @@
+// Package service is ...
 package service
 
 //go:generate mockgen -source $GOFILE -destination ../../mock/service/mock_$GOFILE -package $GOPACKAGE
@@ -21,16 +22,19 @@ type gatheringRepo interface {
 	CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error)
 }
 
+// GatheringService ...
 type GatheringService struct {
 	gatheringRepo gatheringRepo
 }
 
+// NewGatheringService is ...
 func NewGatheringService(repo gatheringRepo) *GatheringService {
 	return &GatheringService{
 		gatheringRepo: repo,
 	}
 }
 
+// CreateGathering is ...
 func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateGatheringReq) (*dto.CreateGatheringRes, error) {
 	if req.Type == domain.GatheringTypeINVITATION && len(req.Attendees) < 1 {
 		return nil, errors.New("attendees must be more than 0 when type is invitation")
@@ -58,6 +62,7 @@ func (gs *GatheringService) CreateGathering(ctx context.Context, req dto.CreateG
 	}, nil
 }
 
+// AttendGathering is ...
 func (gs *GatheringService) AttendGathering(ctx context.Context, currentTime time.Time, req dto.CreateAttendeeReq) (*dto.CreateAttendeeRes, error) {
 	member, err := gs.gatheringRepo.FindMemberByID(ctx, req.MemberID)
 	if err != nil {

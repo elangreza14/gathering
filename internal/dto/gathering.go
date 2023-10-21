@@ -8,6 +8,7 @@ import (
 
 // https://blog.logrocket.com/gin-binding-in-go-a-tutorial-with-examples/
 
+// CreateGatheringReq is ...
 type CreateGatheringReq struct {
 	Creator    string               `json:"creator" binding:"required"`
 	Type       domain.GatheringType `json:"type" binding:"oneof=FREE INVITATION"`
@@ -17,6 +18,7 @@ type CreateGatheringReq struct {
 	Attendees  []int64              `json:"attendees"`
 }
 
+// CreateGatheringRes is ...
 type CreateGatheringRes struct {
 	ID int64 `json:"id"`
 }

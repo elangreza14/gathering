@@ -1,4 +1,5 @@
-package repoPostgres
+// Package postgres is ...
+package postgres
 
 import (
 	"context"
@@ -9,48 +10,58 @@ import (
 
 // https://github.com/DATA-DOG/go-sqlmock
 
+// RepoPostgres is ...
 type RepoPostgres struct{ db *sql.DB }
 
-func New(db *sql.DB) *RepoPostgres {
+// NewRepoPostgres is ...
+func NewRepoPostgres(db *sql.DB) *RepoPostgres {
 	return &RepoPostgres{
 		db: db,
 	}
 }
 
-func (r *RepoPostgres) FindMemberByID(ctx context.Context, ID int64) (*domain.Member, error) {
+// FindMemberByID is ...
+func (r *RepoPostgres) FindMemberByID(ctx context.Context, id int64) (*domain.Member, error) {
 	const getMember = `
 	SELECT id, email, first_name, last_name FROM members
 	WHERE id = $1 LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, getMember, ID)
+	row := r.db.QueryRowContext(ctx, getMember, id)
 	i := &domain.Member{}
 	err := row.Scan(&i.ID, &i.Email, &i.FirstName, &i.LastName)
 	return i, err
 }
 
-func (r *RepoPostgres) FindInvitationByID(ctx context.Context, ID int64) (*domain.Invitation, error) {
+// FindInvitationByID is ...
+func (r *RepoPostgres) FindInvitationByID(ctx context.Context, id int64) (*domain.Invitation, error) {
 	const getInvitation = `
 	SELECT id, member_id, gathering_id, status FROM invitations
 	WHERE id = $1 LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, getInvitation, ID)
+	row := r.db.QueryRowContext(ctx, getInvitation, id)
 	i := &domain.Invitation{}
 	err := row.Scan(&i.ID, &i.MemberID, &i.GatheringID, &i.Status)
 	return i, err
 }
 
-func (r *RepoPostgres) FindGatheringByID(ctx context.Context, ID int64) (*domain.Gathering, error) {
+// FindGatheringByID is ...
+func (r *RepoPostgres) FindGatheringByID(ctx context.Context, id int64) (*domain.Gathering, error) {
 	const getGathering = `
 	SELECT id, creator, type, schedule_at, name, location FROM gatherings
 	WHERE id = $1 LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, getGathering, ID)
+	row := r.db.QueryRowContext(ctx, getGathering, id)
 	i := &domain.Gathering{}
 	err := row.Scan(&i.ID, &i.Creator, &i.Type, &i.ScheduleAt, &i.Name, &i.Location)
 	return i, err
 }
 
-func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(ctx context.Context, gatheringID, memberID int64) (*domain.Invitation, error) {
+// FindInvitationByGatheringIDAndMemberID is ...
+func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(
+	ctx context.Context,
+	gatheringID,
+	memberID int64,
+) (*domain.Invitation, error) {
 	const getInvitation = `
 	SELECT id, member_id, gathering_id, status FROM invitations
 	WHERE gathering_id = $1 AND member_id=$2 LIMIT 1`
@@ -61,6 +72,7 @@ func (r *RepoPostgres) FindInvitationByGatheringIDAndMemberID(ctx context.Contex
 	return i, err
 }
 
+// CreateMember is ...
 func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*domain.Member, error) {
 	const createAuthor = `
 	INSERT INTO members (
@@ -76,6 +88,7 @@ func (r *RepoPostgres) CreateMember(ctx context.Context, arg domain.Member) (*do
 	return i, err
 }
 
+// CreateGathering is ...
 func (r *RepoPostgres) CreateGathering(ctx context.Context, arg domain.Gathering) (*domain.Gathering, error) {
 	const createGathering = `
 	INSERT INTO gatherings (
@@ -91,6 +104,7 @@ func (r *RepoPostgres) CreateGathering(ctx context.Context, arg domain.Gathering
 	return i, err
 }
 
+// CreateAttendee is ...
 func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) (*domain.Attendee, error) {
 	const createAttendee = `
 	INSERT INTO attendees (
@@ -106,7 +120,13 @@ func (r *RepoPostgres) CreateAttendee(ctx context.Context, arg domain.Attendee) 
 	return i, err
 }
 
-func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64, status domain.InvitationStatus, memberIDs ...int64) error {
+// CreateInvitations is ...
+func (r *RepoPostgres) CreateInvitations(
+	ctx context.Context,
+	gatheringID int64,
+	status domain.InvitationStatus,
+	memberIDs ...int64,
+) error {
 	const createInvitation = `
 	INSERT INTO invitations (
 	  member_id, gathering_id, status
@@ -119,6 +139,7 @@ func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64,
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	for i := 0; i < len(memberIDs); i++ {
 		if _, err = stmt.ExecContext(ctx, memberIDs[i], gatheringID, status); err != nil {
@@ -129,6 +150,7 @@ func (r *RepoPostgres) CreateInvitations(ctx context.Context, gatheringID int64,
 	return nil
 }
 
+// UpdateInvitation is ...
 func (r *RepoPostgres) UpdateInvitation(ctx context.Context, arg domain.Invitation) error {
 	const updateInvitation = `
 	UPDATE invitations SET status = $2
