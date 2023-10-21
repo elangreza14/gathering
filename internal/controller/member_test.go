@@ -72,7 +72,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_CreateMember() {
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"Key: 'CreateMemberReq.Email' Error:Field validation for 'Email' failed on the 'required' tag","result":"error"}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"Email","message":"This field is required"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -142,7 +142,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"Key: 'RespondInvitationReq.Attend' Error:Field validation for 'Attend' failed on the 'oneof' tag","result":"error"}`, string(responseData))
+		suite.Equal(`{"result":"errors","error":[{"field":"Attend","message":"Unknown error"}]}`, string(responseData))
 		suite.Equal(http.StatusBadRequest, w.Code)
 	})
 
@@ -159,7 +159,7 @@ func (suite *TestMemberControllerSuite) TestMemberController_RespondInvitation()
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal(`{"cause":"errors from db","result":"error"}`, string(responseData))
+		suite.Equal(`{"result":"error","error":"errors from db"}`, string(responseData))
 		suite.Equal(http.StatusInternalServerError, w.Code)
 	})
 

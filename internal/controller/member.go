@@ -82,7 +82,7 @@ func (mc *MemberController) RespondInvitation() gin.HandlerFunc {
 
 		err := mc.memberService.RespondInvitation(c.Request.Context(), json)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, dto.NewBaseResponse(nil, err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, dto.NewBaseResponse(nil, err))
 			return
 		}
 

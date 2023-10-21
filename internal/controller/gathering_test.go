@@ -171,7 +171,7 @@ func (suite *TestGatheringControllerSuite) TestGatheringController_AttendGatheri
 		r.ServeHTTP(w, req)
 
 		responseData, _ := io.ReadAll(w.Body)
-		suite.Equal("{\"data\":{\"id\":1},\"status\":\"ok\"}", string(responseData))
+		suite.Equal(`{"data":{"id":1},"result":"ok"}`, string(responseData))
 		suite.Equal(http.StatusCreated, w.Code)
 	})
 }

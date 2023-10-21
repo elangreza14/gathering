@@ -28,8 +28,7 @@ type ErrorResponse struct {
 // NewBaseResponse ...
 func NewBaseResponse(data any, err error) any {
 	if data == nil && err == nil {
-		return SuccessResponse{
-			Data:   data,
+		return SuccessResponsePlain{
 			Result: "ok",
 		}
 	}
