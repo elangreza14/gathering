@@ -381,10 +381,12 @@ const docTemplate = `{
             ],
             "properties": {
                 "gathering_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "member_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -497,6 +499,7 @@ const docTemplate = `{
         "dto.RespondInvitationReq": {
             "type": "object",
             "required": [
+                "attend",
                 "invitation_id",
                 "member_id"
             ],
@@ -504,8 +507,7 @@ const docTemplate = `{
                 "attend": {
                     "enum": [
                         "ATTEND",
-                        "ABSENT",
-                        "asas"
+                        "ABSENT"
                     ],
                     "allOf": [
                         {
@@ -514,10 +516,12 @@ const docTemplate = `{
                     ]
                 },
                 "invitation_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "member_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },

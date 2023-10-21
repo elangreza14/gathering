@@ -77,8 +77,8 @@ func getErrorMsg(fe validator.FieldError) string {
 			opt += option[i]
 		}
 		return "Should be " + opt
-		// case "gte":
-		// 	return "Should be greater than " + fe.Param()
+	case "gte":
+		return "Should be greater than " + fe.Param()
 	}
 	return "Unknown error"
 }

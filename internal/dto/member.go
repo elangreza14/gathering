@@ -17,7 +17,7 @@ type CreateMemberRes struct {
 
 // RespondInvitationReq ...
 type RespondInvitationReq struct {
-	MemberID     int64                   `json:"member_id" binding:"required"`
-	InvitationID int64                   `json:"invitation_id" binding:"required"`
-	Attend       domain.InvitationStatus `json:"attend" binding:"oneof=ATTEND ABSENT"`
+	MemberID     int64                   `json:"member_id" binding:"required,gte=0"`
+	InvitationID int64                   `json:"invitation_id" binding:"required,gte=0"`
+	Attend       domain.InvitationStatus `json:"attend" binding:"required,oneof=ATTEND ABSENT"`
 }

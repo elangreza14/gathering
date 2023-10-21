@@ -3,8 +3,8 @@ package dto
 
 // CreateAttendeeReq ...
 type CreateAttendeeReq struct {
-	MemberID    int64 `json:"member_id" binding:"required"`
-	GatheringID int64 `json:"gathering_id" binding:"required"`
+	MemberID    int64 `json:"member_id" binding:"required,gte=0"`
+	GatheringID int64 `json:"gathering_id" binding:"required,gte=0"`
 }
 
 // CreateAttendeeRes ...

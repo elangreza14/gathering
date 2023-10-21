@@ -375,10 +375,12 @@
             ],
             "properties": {
                 "gathering_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "member_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -491,6 +493,7 @@
         "dto.RespondInvitationReq": {
             "type": "object",
             "required": [
+                "attend",
                 "invitation_id",
                 "member_id"
             ],
@@ -498,8 +501,7 @@
                 "attend": {
                     "enum": [
                         "ATTEND",
-                        "ABSENT",
-                        "asas"
+                        "ABSENT"
                     ],
                     "allOf": [
                         {
@@ -508,10 +510,12 @@
                     ]
                 },
                 "invitation_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "member_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },

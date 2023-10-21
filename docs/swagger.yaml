@@ -21,8 +21,10 @@ definitions:
   dto.CreateAttendeeReq:
     properties:
       gathering_id:
+        minimum: 0
         type: integer
       member_id:
+        minimum: 0
         type: integer
     required:
     - gathering_id
@@ -105,12 +107,14 @@ definitions:
         enum:
         - ATTEND
         - ABSENT
-        - asas
       invitation_id:
+        minimum: 0
         type: integer
       member_id:
+        minimum: 0
         type: integer
     required:
+    - attend
     - invitation_id
     - member_id
     type: object
